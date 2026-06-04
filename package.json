@@ -1,0 +1,16 @@
+{
+  "name": "hootsuite",
+  "version": "3.1.0",
+  "description": "HootSuite 🦉 — The owl that hoots commands at your computer",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev"
+  },
+  "keywords": ["ai", "dashboard", "hootsuite", "owl", "hermes", "electron"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "electron": "^33.0.0"
+  }
+}

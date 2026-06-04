@@ -1,0 +1,2064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HootSuite 🦉</title>
+<style>
+:root{--bg:#0f1729;--sbg:#1a2540;--tbg:#243056;--inp:#0d1525;--tx:#f0f4ff;--ts:#94a3c8;--tm:#5a6f98;--ac:#60a5fa;--ah:#3b82f6;--ag:rgba(96,165,250,.12);--bd:#2d3f60;--ok:#4ade80;--wn:#fbbf24;--er:#f87171;--pr:#c084fc;--or:#fb923c;--gn:#34d399;--sw:250px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--tx);height:100vh;display:flex;overflow:hidden;-webkit-user-select:none;user-select:none;font-size:13px;line-height:1.5}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bd);border-radius:10px}
+button,input,textarea{-webkit-user-select:text;user-select:text}
+
+/* SIDEBAR */
+.sb{width:var(--sw);background:var(--sbg);border-right:1px solid var(--bd);display:flex;flex-direction:column;-webkit-app-region:drag;flex-shrink:0}
+.sb-head{padding:16px 14px 10px;display:flex;align-items:center;gap:10px}
+.sb-logo{width:40px;height:40px;border-radius:12px;flex-shrink:0;background:linear-gradient(135deg,#f97316,#eab308);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 2px 20px rgba(249,115,22,.25);transition:transform .3s;cursor:pointer}
+.sb-logo:hover{transform:rotate(-8deg) scale(1.08)}
+.sb-logo.spin{animation:spin .5s ease-in-out}
+@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+.sb-title{font-size:16px;font-weight:800;letter-spacing:-.3px;line-height:1.2}
+.sb-tag{font-size:9px;color:var(--ts);letter-spacing:.3px;text-transform:uppercase}
+.sb-nav{padding:4px 8px;flex:1;overflow-y:auto}
+.ns{font-size:9px;font-weight:700;text-transform:uppercase;color:var(--tm);letter-spacing:1.2px;padding:16px 10px 5px}
+.ni{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:8px;cursor:pointer;font-size:12.5px;color:var(--ts);transition:all .1s;-webkit-app-region:no-drag;margin-bottom:1px;border:1px solid transparent}
+.ni:hover{background:var(--tbg);color:var(--tx);border-color:var(--bd)}
+.ni.on{background:var(--ag);color:var(--ac);font-weight:600;border-color:rgba(56,189,248,.15)}
+.ni .ic{width:18px;text-align:center;font-size:14px;flex-shrink:0}
+.nb{margin-left:auto;font-size:9px;font-weight:700;padding:1px 6px;border-radius:7px;background:var(--ag);color:var(--ac)}
+.sb-foot{padding:10px 14px;border-top:1px solid var(--bd)}
+.sr{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--ts)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 6px var(--ok)}
+.dot.w{background:var(--wn);box-shadow:0 0 6px var(--wn)}
+.dot.e{background:var(--er);box-shadow:0 0 6px var(--er)}
+
+/* MAIN */
+.mn{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.tb{padding:10px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;min-height:44px;-webkit-app-region:drag;gap:8px;background:var(--sbg)}
+.tb h2{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ta{display:flex;gap:4px;-webkit-app-region:no-drag;flex-shrink:0}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:6px;border:1px solid var(--bd);background:var(--sbg);color:var(--tx);font-size:11px;font-family:inherit;cursor:pointer;transition:all .12s;white-space:nowrap}
+.btn:hover{background:var(--tbg);border-color:var(--tm)}
+.btn.p{background:var(--ac);color:#0a0e14;border-color:var(--ac);font-weight:700}
+.btn.p:hover{background:var(--ah)}
+.btn.d{border-color:var(--er);color:var(--er)}
+.btn.d:hover{background:rgba(248,81,73,.08)}
+.btn.g{border-color:var(--ok);color:var(--ok)}
+.btn.g:hover{background:rgba(63,185,80,.08)}
+.btn.sm{padding:3px 7px;font-size:10px}
+.btn:active{transform:scale(.97)}
+
+/* PANELS */
+.pn{display:none;flex:1;overflow-y:auto;padding:16px}
+.pn.show{display:block}
+.pw{max-width:960px;margin:0 auto}
+
+/* CARDS */
+.cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:16px}
+.cd{background:var(--sbg);border:1px solid var(--bd);border-radius:10px;padding:14px;transition:all .15s}
+.cd:hover{border-color:var(--ac);box-shadow:0 2px 12px rgba(0,0,0,.2)}
+.cl{font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--tm);margin-bottom:5px;font-weight:700}
+.cv{font-size:20px;font-weight:800;letter-spacing:-.4px}
+.cs{font-size:10px;color:var(--ts);margin-top:2px}
+.cb{height:3px;background:var(--tbg);border-radius:3px;margin-top:8px;overflow:hidden}
+.cf{height:100%;border-radius:3px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+
+/* CHAT */
+.chat-outer{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.chat-msgs{flex:1;overflow-y:auto;padding:14px 16px}
+.mg{display:flex;gap:10px;margin-bottom:12px;animation:mF .2s ease-out}
+@keyframes mF{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.av{width:30px;height:30px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;margin-top:1px}
+.av.u{background:var(--tbg);border:1px solid var(--bd)}
+.av.h{background:linear-gradient(135deg,#f97316,#eab308);box-shadow:0 1px 8px rgba(249,115,22,.2)}
+.mb{flex:1;min-width:0}
+.mh{display:flex;align-items:center;gap:7px;margin-bottom:2px}
+.mn2{font-size:11px;font-weight:700}
+.mt2{font-size:10px;color:var(--tm)}
+.mt3{font-size:12.5px;line-height:1.6;word-wrap:break-word}
+.mt3 strong{font-weight:700}
+.mt3 code{background:var(--tbg);padding:1px 5px;border-radius:3px;font-family:ui-monospace,SFMono-Regular,monospace;font-size:11px}
+.mt3 pre{background:var(--tbg);border:1px solid var(--bd);border-radius:8px;padding:10px;margin:5px 0;overflow-x:auto;font-size:11.5px;line-height:1.4;font-family:ui-monospace,SFMono-Regular,monospace}
+.mt3 pre code{background:none;padding:0;font-size:inherit;border-radius:0}
+.mt3 ul,.mt3 ol{padding-left:18px;margin:4px 0}
+.mt3 li{margin-bottom:2px}
+.mt3 a{color:var(--ac);text-decoration:none}
+.mt3 a:hover{text-decoration:underline}
+
+/* Chat input */
+.ci{padding:8px 14px 12px;border-top:1px solid var(--bd);background:var(--sbg)}
+.ciw{display:flex;align-items:flex-end;gap:6px;background:var(--inp);border:1px solid var(--bd);border-radius:10px;padding:6px 8px;transition:border-color .2s}
+.ciw.foc{border-color:var(--ac);box-shadow:0 0 0 2px var(--ag)}
+.ciw textarea{flex:1;background:none;border:none;color:var(--tx);font-size:12.5px;line-height:1.4;resize:none;outline:none;min-height:18px;max-height:120px;font-family:inherit}
+.ciw textarea::placeholder{color:var(--tm)}
+.ib{display:flex;gap:2px;align-items:center}
+.ib-btn{width:28px;height:28px;border-radius:7px;border:none;background:none;color:var(--ts);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .1s}
+.ib-btn:hover{background:var(--tbg);color:var(--tx)}
+.ib-btn.rec{color:var(--er);animation:pulse 1.2s infinite;background:rgba(248,81,73,.1)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.ib-send{width:28px;height:28px;border-radius:7px;border:none;background:var(--ac);color:#0a0e14;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;transition:all .12s}
+.ib-send:hover{background:var(--ah)}
+.ib-send:disabled{opacity:.3;cursor:not-allowed}
+.ih{font-size:9px;color:var(--tm);margin-top:4px;text-align:center}
+
+/* Typing */
+.td{display:inline-flex;align-items:flex-end;gap:2px;padding:4px 0}
+.td span{width:5px;height:5px;border-radius:50%;background:var(--ts);animation:tb 1.2s infinite}
+.td span:nth-child(2){animation-delay:.15s}
+.td span:nth-child(3){animation-delay:.3s}
+@keyframes tb{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+
+/* Hoot easter egg */
+.hoot-overlay{position:fixed;inset:0;pointer-events:none;z-index:9998;display:flex;align-items:center;justify-content:center}
+.hoot-bubble{font-size:48px;animation:hootPop 2s ease-out forwards;pointer-events:none}
+@keyframes hootPop{0%{transform:scale(0) rotate(-20deg);opacity:0}20%{transform:scale(1.3) rotate(5deg);opacity:1}40%{transform:scale(1) rotate(-3deg);opacity}80%{transform:scale(1) rotate(0);opacity:1}100%{transform:scale(.5) translateY(-100px);opacity:0}}
+.hoot-rain{position:fixed;inset:0;pointer-events:none;z-index:9997;overflow:hidden}
+.hoot-emoji{position:absolute;font-size:24px;animation:hootFall 3s ease-in forwards}
+@keyframes hootFall{0%{transform:translateY(-50px) rotate(0);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+
+/* TERMINAL */
+.term{background:#080b10;border:1px solid var(--bd);border-radius:8px;padding:10px;font-family:ui-monospace,SFMono-Regular,monospace;font-size:11.5px;min-height:180px;white-space:pre-wrap;overflow-y:auto;flex:1;color:var(--ts);word-break:break-all}
+.term .tl{margin-bottom:0;line-height:1.5}
+.tp{color:var(--pr);font-weight:700}
+.tc{color:var(--ac)}
+.te{color:var(--er)}
+.to2{color:var(--ok)}
+.ti{color:var(--tm)}
+.term-in{display:flex;gap:5px;margin-top:6px}
+.term-in .tp{padding:5px 0;color:var(--gn)}
+.term-in input{flex:1;background:var(--inp);border:1px solid var(--bd);border-radius:6px;padding:4px 8px;color:var(--tx);font-family:ui-monospace,monospace;font-size:11.5px;outline:none}
+.term-in input:focus{border-color:var(--ac)}
+
+/* CRON */
+.ct{width:100%;border-collapse:collapse;margin-top:4px}
+.ct th{text-align:left;font-size:9px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.6px;padding:7px 10px;border-bottom:1px solid var(--bd);background:var(--sbg);position:sticky;top:0}
+.ct td{padding:8px 10px;border-bottom:1px solid var(--bd);font-size:12px;vertical-align:middle}
+.ct tr:hover td{background:var(--sbg)}
+.cs3{display:inline-flex;align-items:center;gap:4px;font-size:11px}
+.cs3 .d{width:6px;height:6px;border-radius:50%}
+.cs3 .d.a{background:var(--ok);box-shadow:0 0 4px var(--ok)}
+.cs3 .d.p{background:var(--wn)}
+.raw-output{background:#080b10;border:1px solid var(--bd);border-radius:8px;padding:10px;margin-top:10px;font-family:ui-monospace,monospace;font-size:11px;color:var(--ts);white-space:pre-wrap;max-height:300px;overflow-y:auto}
+.cron-form{background:var(--sbg);border:1px solid var(--bd);border-radius:8px;padding:12px;margin-top:12px}
+.cron-form input,.cron-form textarea,.cron-form select{width:100%;background:var(--inp);border:1px solid var(--bd);border-radius:6px;padding:5px 8px;color:var(--tx);font-family:inherit;font-size:11.5px;margin-bottom:6px;outline:none}
+.cron-form input:focus,.cron-form textarea:focus{border-color:var(--ac)}
+.cron-form textarea{min-height:50px;resize:vertical}
+.cron-form label{font-size:10px;color:var(--ts);font-weight:700;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:2px}
+
+/* SKILLS */
+.sk-search{width:180px;background:var(--inp);border:1px solid var(--bd);border-radius:6px;padding:4px 8px;color:var(--tx);font-size:11px;outline:none}
+.sk-search:focus{border-color:var(--ac)}
+.sk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px}
+.sk-card{background:var(--sbg);border:1px solid var(--bd);border-radius:8px;padding:11px;cursor:pointer;transition:all .12s}
+.sk-card:hover{border-color:var(--ac);transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.sk-hd{display:flex;align-items:center;gap:7px;margin-bottom:4px;flex-wrap:wrap}
+.sk-ic{font-size:14px}
+.sk-nm{font-size:11.5px;font-weight:700}
+.sk-ct{font-size:8px;font-weight:700;padding:1px 5px;border-radius:3px;background:var(--tbg);color:var(--tm);text-transform:uppercase;letter-spacing:.3px}
+.sk-d{font-size:10.5px;color:var(--ts);line-height:1.4}
+
+/* SKILL MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9990;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-overlay.show{display:flex}
+.modal{background:var(--sbg);border:1px solid var(--bd);border-radius:14px;padding:20px;max-width:480px;width:90%;box-shadow:0 8px 40px rgba(0,0,0,.4);animation:modalIn .25s ease-out}
+@keyframes modalIn{from{opacity:0;transform:scale(.9) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.modal-icon{font-size:28px}
+.modal-title{font-size:16px;font-weight:800}
+.modal-cat{font-size:9px;font-weight:700;padding:2px 8px;border-radius:4px;background:var(--tbg);color:var(--tm);text-transform:uppercase;letter-spacing:.5px}
+.modal-desc{font-size:12.5px;color:var(--tx);line-height:1.6;margin-bottom:12px}
+.modal-snark{font-size:12px;color:var(--ts);line-height:1.6;font-style:italic;background:var(--tbg);border-left:3px solid var(--ac);padding:8px 12px;border-radius:0 6px 6px 0;margin-bottom:12px}
+.modal-close{float:right;background:none;border:none;color:var(--ts);font-size:18px;cursor:pointer;padding:0 4px}
+.modal-close:hover{color:var(--tx)}
+
+/* SECTIONS */
+.sec{font-size:15px;font-weight:800;margin-bottom:12px;letter-spacing:-.3px;display:flex;align-items:center;gap:6px}
+.sec-sub{font-size:10.5px;color:var(--ts);margin:-8px 0 12px;font-weight:400}
+
+/* TOGGLE */
+.tog{width:34px;height:18px;border-radius:9px;background:var(--tbg);border:1px solid var(--bd);cursor:pointer;position:relative;transition:all .25s}
+.tog.on{background:var(--ok);border-color:var(--ok)}
+.tog::after{content:'';width:12px;height:12px;border-radius:50%;background:var(--tx);position:absolute;top:2px;left:2px;transition:transform .25s cubic-bezier(.4,0,.2,1)}
+.tog.on::after{transform:translateX(16px)}
+
+/* SETTINGS */
+.sg2{margin-bottom:20px}
+.sg2 h3{font-size:9px;font-weight:700;color:var(--ts);margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px}
+.sr2{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bd)}
+.sl{font-size:12px}
+.sd2{font-size:10px;color:var(--tm);margin-top:1px}
+
+/* PROMPTS */
+.prompt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px}
+.prompt-card{background:var(--sbg);border:1px solid var(--bd);border-radius:8px;padding:12px;cursor:pointer;transition:all .12s}
+.prompt-card:hover{border-color:var(--ac);background:var(--tbg)}
+.prompt-card .p-emoji{font-size:18px;margin-bottom:4px}
+.prompt-card .p-title{font-size:12px;font-weight:700;margin-bottom:2px}
+.prompt-card .p-desc{font-size:10px;color:var(--ts);line-height:1.4}
+.prompt-card .p-cmd{font-size:10px;color:var(--ac);font-family:monospace;margin-top:4px;background:var(--bg);padding:3px 6px;border-radius:4px}
+
+/* NOTES */
+.notes-area{background:var(--sbg);border:1px solid var(--bd);border-radius:8px;padding:10px;width:100%;min-height:80px;color:var(--tx);font-family:inherit;font-size:12px;resize:vertical;outline:none}
+.notes-area:focus{border-color:var(--ac)}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--sbg);border:1px solid var(--ac);border-radius:8px;padding:8px 14px;font-size:11px;color:var(--tx);box-shadow:0 4px 20px rgba(0,0,0,.3);z-index:9999;animation:tI .3s ease-out,tO .3s ease-in 2.7s forwards;pointer-events:none}
+@keyframes tI{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes tO{from{opacity:1}to{opacity:0}}
+
+/* ANIMATIONS */
+.hoot-entry{animation:hI .4s cubic-bezier(.34,1.56,.64,1)}
+@keyframes hI{from{opacity:0;transform:scale(.8) rotate(-5deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+
+/* MODEL SWITCHER */
+.model-tabs{display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap}
+.model-tab{padding:5px 12px;border-radius:6px;border:1px solid var(--bd);background:var(--sbg);color:var(--ts);font-size:11px;font-family:inherit;cursor:pointer;transition:all .12s;white-space:nowrap}
+.model-tab:hover{background:var(--tbg);color:var(--tx)}
+.model-tab.on{background:var(--ag);color:var(--ac);font-weight:600;border-color:var(--ac)}
+.model-card{background:var(--sbg);border:1px solid var(--bd);border-radius:8px;padding:12px;margin-bottom:6px;display:flex;align-items:center;gap:10px;transition:all .12s}
+.model-card:hover{border-color:var(--ac);background:var(--tbg)}
+.model-card.active{border-color:var(--ok);box-shadow:0 0 0 1px var(--ok)}
+.model-icon{font-size:20px;width:32px;text-align:center;flex-shrink:0}
+.model-info{flex:1;min-width:0}
+.model-name{font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.model-tag{font-size:8px;font-weight:700;padding:1px 5px;border-radius:3px;text-transform:uppercase;letter-spacing:.3px}
+.tag-free{background:rgba(74,222,128,.15);color:var(--ok)}
+.tag-paid{background:rgba(251,191,36,.15);color:var(--wn)}
+.tag-active{background:rgba(96,165,250,.15);color:var(--ac);border:1px solid rgba(96,165,250,.3)}
+.model-desc{font-size:10px;color:var(--ts);margin-top:2px;line-height:1.3}
+.model-price{font-size:10px;color:var(--tm);text-align:right;white-space:nowrap}
+.model-ctx{font-size:9px;color:var(--tm);background:var(--tbg);padding:1px 5px;border-radius:3px}
+.api-section{background:var(--sbg);border:1px solid var(--bd);border-radius:8px;padding:12px;margin-top:12px}
+.api-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.api-label{font-size:10px;color:var(--ts);font-weight:700;text-transform:uppercase;letter-spacing:.5px;width:80px;flex-shrink:0}
+.api-input{flex:1;background:var(--inp);border:1px solid var(--bd);border-radius:6px;padding:5px 8px;color:var(--tx);font-family:ui-monospace,monospace;font-size:11px;outline:none}
+.api-input:focus{border-color:var(--ac)}
+.api-link{font-size:10px;color:var(--ac);text-decoration:none;white-space:nowrap}
+.api-link:hover{text-decoration:underline}
+.api-status{font-size:10px;display:flex;align-items:center;gap:4px}
+.api-status.ok{color:var(--ok)}
+.api-status.no{color:var(--er)}
+
+/* COMMUNITY SKILLS BROWSER */
+.comm-tabs{display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap}
+.comm-tab{padding:5px 12px;border-radius:6px;border:1px solid var(--bd);background:var(--sbg);color:var(--ts);font-size:11px;font-family:inherit;cursor:pointer;transition:all .12s}
+.comm-tab:hover{background:var(--tbg);color:var(--tx)}
+.comm-tab.on{background:var(--ag);color:var(--ac);font-weight:600;border-color:var(--ac)}
+.comm-card{background:var(--sbg);border:1px solid var(--bd);border-radius:8px;padding:12px;margin-bottom:6px;display:flex;align-items:flex-start;gap:10px;transition:all .12s}
+.comm-card:hover{border-color:var(--ac);transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.comm-icon{font-size:22px;width:36px;text-align:center;flex-shrink:0;padding-top:1px}
+.comm-info{flex:1;min-width:0}
+.comm-name{font-size:12px;font-weight:700;margin-bottom:2px}
+.comm-repo{font-size:9px;color:var(--tm);font-family:monospace;margin-bottom:3px}
+.comm-desc{font-size:10.5px;color:var(--ts);line-height:1.4}
+.comm-tags{display:flex;gap:3px;margin-top:4px;flex-wrap:wrap}
+.comm-tag{font-size:8px;font-weight:700;padding:1px 5px;border-radius:3px;background:var(--tbg);color:var(--tm);text-transform:uppercase;letter-spacing:.3px}
+.comm-tag.hot{background:rgba(248,113,113,.15);color:var(--er)}
+.comm-tag.new{background:rgba(74,222,128,.15);color:var(--ok)}
+.comm-tag.community{background:rgba(192,132,252,.15);color:var(--pr)}
+.comm-snark{font-size:10px;color:var(--ts);font-style:italic;background:var(--tbg);border-left:3px solid var(--ac);padding:5px 8px;border-radius:0 4px 4px 0;margin-top:5px}
+.comm-actions{display:flex;gap:4px;flex-direction:column;flex-shrink:0}
+.comm-btn{padding:4px 10px;border-radius:5px;border:1px solid var(--bd);background:var(--sbg);color:var(--tx);font-size:10px;font-family:inherit;cursor:pointer;transition:all .12s;white-space:nowrap}
+.comm-btn:hover{background:var(--tbg)}
+.comm-btn.install{background:var(--ok);color:#0a0e14;border-color:var(--ok);font-weight:700}
+.comm-btn.install:hover{background:#22c55e}
+.comm-btn.preview{border-color:var(--ac);color:var(--ac)}
+.comm-search-row{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.comm-stats{display:flex;gap:12px;margin-bottom:12px;font-size:10px;color:var(--tm)}
+
+/* LIVE MONITOR */
+.monitor-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-bottom:12px}
+.monitor-card{background:var(--sbg);border:1px solid var(--bd);border-radius:8px;padding:10px;text-align:center}
+.monitor-val{font-size:18px;font-weight:800;letter-spacing:-.3px}
+.monitor-lbl{font-size:9px;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.monitor-bar{height:3px;background:var(--tbg);border-radius:3px;margin-top:6px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;transition:width .5s}
+.refresh-btn{font-size:9px;color:var(--tm);background:none;border:1px solid var(--bd);padding:2px 6px;border-radius:3px;cursor:pointer;margin-left:auto}
+.refresh-btn:hover{color:var(--tx);border-color:var(--ac)}
+</style>
+</head>
+<body>
+
+<!-- Hoot overlay container -->
+<div id="hootOverlay" class="hoot-overlay"></div>
+<div id="hootRain" class="hoot-rain"></div>
+
+<!-- SIDEBAR -->
+<div class="sb">
+  <div class="sb-head">
+    <div class="sb-logo" id="sbLogo">🦉</div>
+    <div><div class="sb-title">HootSuite</div><div class="sb-tag">Owling your commands</div></div>
+  </div>
+  <div class="sb-nav">
+    <div class="ns">Main</div>
+    <div class="ni on" data-p="chat"><span class="ic">💬</span> Chat</div>
+    <div class="ni" data-p="dash"><span class="ic">📊</span> Dashboard</div>
+    <div class="ni" data-p="prompts"><span class="ic">✨</span> Quick Prompts</div>
+    <div class="ns">Tools</div>
+    <div class="ni" data-p="term"><span class="ic">⬛</span> Terminal</div>
+    <div class="ni" data-p="cron"><span class="ic">⏰</span> Cron Jobs <span class="nb" id="crC">?</span></div>
+    <div class="ni" data-p="skills"><span class="ic">🧩</span> Skills <span class="nb" id="skC">86</span></div>
+    <div class="ni" data-p="models"><span class="ic">🧠</span> AI Models <span class="nb" id="mdC">25+</span></div>
+    <div class="ni" data-p="community"><span class="ic">🌐</span> Community</div>
+    <div class="ni" data-p="evolve"><span class="ic">🧬</span> Self-Evolution <span class="nb">NEW</span></div>
+    <div class="ni" data-p="kanban"><span class="ic">📋</span> Kanban <span class="nb">NEW</span></div>
+    <div class="ni" data-p="monitor"><span class="ic">📡</span> Live Monitor</div>
+    <div class="ni" data-p="fun"><span class="ic">🎪</span> Fun Zone</div>
+    <div class="ni" data-p="files"><span class="ic">📁</span> Files</div>
+    <div class="ni" data-p="notes"><span class="ic">📝</span> Notes</div>
+    <div class="ns">Config</div>
+    <div class="ni" data-p="set"><span class="ic">⚙️</span> Settings</div>
+  </div>
+  <div class="sb-foot"><div class="sr"><span class="dot" id="stDot"></span><span id="stTxt">Connecting…</span></div></div>
+</div>
+
+<!-- MAIN -->
+<div class="mn">
+
+<!-- CHAT -->
+<div class="pn show" id="p-chat" style="display:flex;flex-direction:column;overflow:hidden">
+  <div class="tb"><h2>💬 Chat with HootSuite</h2><div class="ta"><button class="btn sm" onclick="clChat()">🗑 Clear</button><button class="btn sm" onclick="exportChat()">📥 Export</button></div></div>
+  <div class="chat-outer" style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+    <div id="owlGifContainer"></div>
+    <div class="chat-msgs" id="msgs"></div>
+    <div class="ci">
+      <div class="ciw" id="ciw">
+        <textarea id="ci" placeholder="Hoot something at me… 🦉 (try typing 'hoot'!)" rows="1" oninput="onChatInput(this)" onkeydown="chatKey(event)"></textarea>
+        <div class="ib">
+          <button class="ib-btn" id="micBtn" onclick="toggleMic()" title="Voice input">🎤</button>
+          <button class="ib-send" id="sendBtn" onclick="sendChat()" title="Send (Enter)">➤</button>
+        </div>
+      </div>
+      <div class="ih">Enter = send · Shift+Enter = new line · 🎤 = voice · Type "hoot" for a surprise!</div>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="pn" id="p-dash"><div class="pw" id="dashContent"></div></div>
+
+<!-- QUICK PROMPTS -->
+<div class="pn" id="p-prompts"><div class="pw"><div class="sec">✨ Quick Prompts</div><div class="sec-sub">Click any prompt to hoot it at Hermes</div><div class="prompt-grid" id="promptGrid"></div></div></div>
+
+<!-- TERMINAL -->
+<div class="pn" id="p-term"><div class="pw" style="display:flex;flex-direction:column;overflow:hidden;max-width:100%">
+  <div class="tb" style="margin:-16px -16px 0;padding:8px 16px;min-height:38px"><h2>⬛ Terminal</h2><div class="ta"><button class="btn sm d" onclick="clrTerm()">Clear</button></div></div>
+  <div style="display:flex;flex-wrap:wrap;gap:4px;margin:10px 0 8px">
+    <button class="btn sm" onclick="exec('hermes status')">hermes status</button>
+    <button class="btn sm" onclick="exec('hermes cron list')">cron list</button>
+    <button class="btn sm" onclick="exec('free -h')">memory</button>
+    <button class="btn sm" onclick="exec('df -h /')">disk</button>
+    <button class="btn sm" onclick="exec('uptime -p')">uptime</button>
+    <button class="btn sm" onclick="exec('uname -a')">kernel</button>
+    <button class="btn sm" onclick="exec('ls -la ~')">home</button>
+    <button class="btn sm" onclick="exec('cat /etc/os-release | head -4')">OS</button>
+  </div>
+  <div class="term" id="tOut" style="flex:1"><span class="tp">hoot</span> <span class="ti">› ready. Click a button or type below.</span></div>
+  <div class="term-in"><span class="tp">hoot ›</span><input id="tIn" placeholder="Type any shell command…" onkeydown="if(event.key==='Enter'){var v=this.value;this.value='';exec(v);}"><button class="btn p sm" onclick="var i=document.getElementById('tIn');exec(i.value);i.value='';">Run</button>
+</div></div></div>
+
+<!-- CRON -->
+<div class="pn" id="p-cron"><div class="pw">
+  <div class="tb" style="margin:-16px -16px 0;padding:8px 16px;min-height:38px"><h2>⏰ Cron Jobs</h2><div class="ta"><button class="btn sm g" onclick="toggleCronForm()">+ New Job</button><button class="btn sm p" onclick="loadCron()">↻ Refresh</button></div></div>
+  <div id="cronForm" class="cron-form" style="display:none">
+    <label>Schedule (e.g. "every 2h", "0 9 * * *", "30m")</label>
+    <input id="cronSched" placeholder="every 2h">
+    <label>What should Hermes do?</label>
+    <textarea id="cronPrompt" placeholder="Check server status and report any issues…"></textarea>
+    <label>Name (optional)</label>
+    <input id="cronName" placeholder="My scheduled task">
+    <div style="display:flex;gap:5px;margin-top:4px"><button class="btn p sm" onclick="createCronJob()">🦉 Create Job</button><button class="btn sm" onclick="toggleCronForm()">Cancel</button></div>
+  </div>
+  <div style="margin-top:8px">
+    <table class="ct" id="crTable"><thead><tr><th>Job</th><th>Schedule</th><th>Status</th><th>Actions</th></tr></thead><tbody></tbody></table>
+    <div id="crRaw"></div>
+  </div>
+</div></div>
+
+<!-- SKILLS -->
+<div class="pn" id="p-skills"><div class="pw">
+  <div class="tb" style="margin:-16px -16px 0;padding:8px 16px;min-height:38px">
+    <h2>🧩 Skills <span style="font-size:10px;color:var(--tm);font-weight:400" id="skCount"></span></h2>
+    <div class="ta"><input class="sk-search" placeholder="Search 86 skills…" id="skSearch" oninput="filterSkills()"></div>
+  </div>
+  <div style="margin-top:8px"><div class="sk-grid" id="skGrid"></div></div>
+</div></div>
+
+<!-- AI MODELS -->
+<div class="pn" id="p-models"><div class="pw">
+  <div class="tb" style="margin:-16px -16px 0;padding:8px 16px;min-height:38px">
+    <h2>🧠 AI Model Switcher</h2>
+    <div class="ta"><button class="btn sm" onclick="refreshModels()">↻ Refresh</button></div>
+  </div>
+  <div style="margin-top:8px">
+    <div class="sec">🔌 Provider API Keys</div>
+    <div class="sec-sub">Paste your API keys securely — they're saved locally and never sent anywhere except the provider</div>
+    <div class="api-section">
+      <div class="api-row">
+        <span class="api-label">OpenRouter</span>
+        <input class="api-input" id="key-openrouter" type="password" placeholder="sk-or-..." oninput="saveApiKey('openrouter',this.value)">
+        <a class="api-link" href="https://openrouter.ai/keys" target="_blank" rel="noopener">Get key →</a>
+        <span class="api-status" id="status-openrouter"></span>
+      </div>
+      <div class="api-row">
+        <span class="api-label">OpenAI</span>
+        <input class="api-input" id="key-openai" type="password" placeholder="sk-..." oninput="saveApiKey('openai',this.value)">
+        <a class="api-link" href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">Get key →</a>
+        <span class="api-status" id="status-openai"></span>
+      </div>
+      <div class="api-row">
+        <span class="api-label">Anthropic</span>
+        <input class="api-input" id="key-anthropic" type="password" placeholder="sk-ant-..." oninput="saveApiKey('anthropic',this.value)">
+        <a class="api-link" href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">Get key →</a>
+        <span class="api-status" id="status-anthropic"></span>
+      </div>
+      <div class="api-row">
+        <span class="api-label">Google</span>
+        <input class="api-input" id="key-google" type="password" placeholder="AIza..." oninput="saveApiKey('google',this.value)">
+        <a class="api-link" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Get key →</a>
+        <span class="api-status" id="status-google"></span>
+      </div>
+      <div class="api-row">
+        <span class="api-label">xAI</span>
+        <input class="api-input" id="key-xai" type="password" placeholder="xai-..." oninput="saveApiKey('xai',this.value)">
+        <a class="api-link" href="https://console.x.ai/" target="_blank" rel="noopener">Get key →</a>
+        <span class="api-status" id="status-xai"></span>
+      </div>
+      <div class="api-row">
+        <span class="api-label">DeepSeek</span>
+        <input class="api-input" id="key-deepseek" type="password" placeholder="sk-..." oninput="saveApiKey('deepseek',this.value)">
+        <a class="api-link" href="https://platform.deepseek.com/api_keys" target="_blank" rel="noopener">Get key →</a>
+        <span class="api-status" id="status-deepseek"></span>
+      </div>
+      <div class="api-row">
+        <span class="api-label">Moonshot</span>
+        <input class="api-input" id="key-moonshot" type="password" placeholder="sk-..." oninput="saveApiKey('moonshot',this.value)">
+        <a class="api-link" href="https://platform.moonshot.ai/console/api-keys" target="_blank" rel="noopener">Get key →</a>
+        <span class="api-status" id="status-moonshot"></span>
+      </div>
+      <div style="margin-top:8px;font-size:10px;color:var(--tm);padding-top:8px;border-top:1px solid var(--bd)">
+        💡 <strong style="color:var(--ts)">How to use:</strong> Paste your key above, then set the model in <code>~/.hermes/config.yaml</code> or tell me "switch to [model name]" in chat.
+        Free models work without any key via OpenRouter! Paid models need their provider key or OpenRouter credits.
+      </div>
+    </div>
+
+    <div class="sec" style="margin-top:16px">⚡ Quick Switch</div>
+    <div class="sec-sub">Click a model to switch to it instantly</div>
+    <div class="model-tabs" id="modelTabs">
+      <button class="model-tab on" onclick="filterModels('all',this)">All Models</button>
+      <button class="model-tab" onclick="filterModels('free',this)">🆓 Free</button>
+      <button class="model-tab" onclick="filterModels('paid',this)">💰 Paid</button>
+      <button class="model-tab" onclick="filterModels('anthropic',this)">Anthropic</button>
+      <button class="model-tab" onclick="filterModels('openai',this)">OpenAI</button>
+      <button class="model-tab" onclick="filterModels('google',this)">Google</button>
+      <button class="model-tab" onclick="filterModels('fast',this)">🚀 Fast</button>
+    </div>
+    <div id="modelsList" style="margin-top:8px"></div>
+  </div>
+</div></div>
+
+<!-- COMMUNITY -->
+<div class="pn" id="p-community"><div class="pw">
+  <div class="tb" style="margin:-16px -16px 0;padding:8px 16px;min-height:38px">
+    <h2>🌐 Community Hub</h2>
+    <div class="ta"><button class="btn sm" onclick="loadCommunity()">↻ Refresh</button></div>
+  </div>
+  <div style="margin-top:8px">
+    <div class="sec">Top Skills & Plugins</div>
+    <div class="sec-sub">Browse community skills and plugins — preview with snark, install with one click</div>
+    <div class="comm-stats" id="commStats"></div>
+    <div class="comm-tabs" id="commTabs">
+      <button class="comm-tab on" onclick="filterCommunity('all',this)">🔥 Trending</button>
+      <button class="comm-tab" onclick="filterCommunity('plugins',this)">🔌 Plugins</button>
+      <button class="comm-tab" onclick="filterCommunity('skills',this)">🧩 Skills</button>
+      <button class="comm-tab" onclick="filterCommunity('mcp',this)">🔗 MCP</button>
+      <button class="comm-tab" onclick="filterCommunity('new',this)">✨ New</button>
+    </div>
+    <div class="comm-search-row">
+      <input class="sk-search" style="flex:1" placeholder="Search community..." id="commSearch" oninput="filterCommunity()">
+      <select class="sk-search" style="width:130px" id="commSort" onchange="filterCommunity()">
+        <option value="stars">⭐ Most Stars</option>
+        <option value="recent">🆕 Recently Updated</option>
+      </select>
+    </div>
+    <div id="commList"></div>
+  </div>
+</div>
+
+<!-- FUN ZONE -->
+<div class="pn" id="p-fun"><div class="pw">
+  <div class="tb" style="margin:-16px -16px 0;padding:8px 16px;min-height:38px">
+    <h2>🎪 Fun Zone</h2>
+    <div class="ta"><button class="btn sm" onclick="sfx.hoot()">🦉 Hoot!</button><button class="btn sm" onclick="sfx.error()">😤 Angry!</button></div>
+  </div>
+  <div style="margin-top:8px">
+    <div class="sec">🦉 Owl Facts Generator</div>
+    <div class="sec-sub">Scientific* owl facts, 100% peer-reviewed**</div>
+    <div style="background:var(--sbg);border:1px solid var(--bd);border-radius:8px;padding:14px;margin-top:8px;text-align:center">
+      <div id="owlFact" style="font-size:13px;color:var(--tx);line-height:1.6;min-height:40px">Click the button for a prestigious owl fact!</div>
+      <button class="btn p sm" style="margin-top:8px" onclick="showOwlFact()">🎲 Generate Fact</button>
+    </div>
+
+    <div class="sec" style="margin-top:16px">🌙 Theme Switcher</div>
+    <div class="sec-sub">Because owls deserve choices too</div>
+    <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+      <button class="btn sm" onclick="setTheme('dark')">🌙 Dark (Default)</button>
+      <button class="btn sm" onclick="setTheme('light')">☀️ Light</button>
+      <button class="btn sm" onclick="setTheme('midnight')">🦉 Midnight</button>
+      <button class="btn sm" onclick="setTheme('solarized')">🌅 Solarized</button>
+      <button class="btn sm" onclick="setTheme('random')">🎲 Random</button>
+    </div>
+
+    <div class="sec" style="margin-top:16px">🔊 Owl Soundboard</div>
+    <div class="sec-sub">Click to play — your neighbors will love it</div>
+    <div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap">
+      <button class="btn sm" onclick="sfx.hoot()">🦉 Hoot</button>
+      <button class="btn sm" onclick="sfx.angry()">😤 Angry Squawk</button>
+      <button class="btn sm" onclick="sfx.thinking()">🤔 Thinking Chirp</button>
+      <button class="btn sm" onclick="sfx.click()">👆 Click</button>
+      <button class="btn sm" onclick="sfx.success()">✨ Success</button>
+      <button class="btn sm" onclick="sfx.error()">💥 Error Buzz</button>
+      <button class="btn sm" onclick="sfx.whoosh()">💨 Whoosh</button>
+      <button class="btn sm" onclick="sfx.pop()">🎈 Pop</button>
+      <button class="btn sm" onclick="playRandomSnd()">🎲 Random</button>
+    </div>
+
+    <div class="sec" style="margin-top:16px">🦉 Logo Size</div>
+    <div class="sec-sub">Make HootSuite as big or small as your ego</div>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+      <span style="font-size:10px;color:var(--tm)">Tiny</span>
+      <input type="range" id="logoSize" min="20" max="80" value="40" style="flex:1;accent-color:var(--ac)" oninput="document.getElementById('sbLogo').style.width=this.value+'px';document.getElementById('sbLogo').style.height=this.value+'px';document.getElementById('sbLogo').style.fontSize=(this.value*0.55)+'px'">
+      <span style="font-size:10px;color:var(--tm)">HUGE</span>
+    </div>
+
+    <div class="sec" style="margin-top:16px">💀 Nuclear Option</div>
+    <div class="sec-sub">Clears everything. No takesies-backsies.</div>
+    <button class="btn d sm" style="margin-top:8px" onclick="nuclearOption()">☢️ NUCLEAR OPTION</button>
+
+    <div class="sec" style="margin-top:16px">🎯 Achievements</div>
+    <div class="sec-sub">Because gamification makes everything better</div>
+    <div id="achievementsList" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px"></div>
+    <button class="btn sm" style="margin-top:8px" onclick="checkAchievements()">↻ Check Achievements</button>
+  </div>
+</div></div>
+
+<!-- LIVE MONITOR -->
+<div class="pn" id="p-monitor"><div class="pw">
+  <div class="tb" style="margin:-16px -16px 0;padding:8px 16px;min-height:38px">
+    <h2>📡 Live System Monitor</h2>
+    <div class="ta">
+      <button class="refresh-btn" onclick="loadMonitor()" title="Refresh now">↻ Refresh</button>
+      <button class="btn sm" onclick="toggleAutoRefresh()">⏱ Auto: ON</button>
+    </div>
+  </div>
+  <div style="margin-top:8px">
+    <div class="sec">System Resources</div>
+    <div class="monitor-grid" id="monitorGrid"></div>
+    <div class="sec" style="margin-top:12px">Processes</div>
+    <div id="processList"></div>
+    <div class="sec" style="margin-top:12px">Network</div>
+    <div id="networkInfo"></div>
+  </div>
+</div></div>
+
+<!-- SELF-EVOLUTION -->
+<div class="pn" id="p-evolve"><div class="pw">
+  <div class="tb" style="margin:-16px -16px 0;padding:8px 16px;min-height:38px">
+    <h2>🧬 Self-Evolution Engine</h2>
+    <div class="ta"><button class="btn sm p" onclick="runEvolution()">▶ Run Evolution</button><button class="btn sm" onclick="loadEvolve()">↻ Refresh</button></div>
+  </div>
+  <div style="margin-top:8px">
+    <div class="sec">Hermes Agent Self-Evolution</div>
+    <div class="sec-sub">Uses DSPy + GEPA to automatically evolve your skills, prompts, and configs. ICLR 2026 Oral. 3.6k ⭐</div>
+    <div style="background:var(--sbg);border:1px solid var(--bd);border-radius:8px;padding:14px;margin-top:8px">
+      <div style="font-size:12px;color:var(--tx);line-height:1.7">
+        <strong>What it does:</strong> Analyzes your skill execution traces and automatically improves them using genetic-pareto prompt evolution. No GPU needed — just API calls.<br><br>
+        <strong>Cost:</strong> ~$2-10 per evolution run<br>
+        <strong>Source:</strong> <a href="https://github.com/NousResearch/hermes-agent-self-evolution" target="_blank" rel="noopener" style="color:var(--ac)">NousResearch/hermes-agent-self-evolution</a>
+      </div>
+    </div>
+    <div class="sec" style="margin-top:16px">Evolution Log</div>
+    <div id="evolveLog" class="raw-output" style="min-height:100px">Click "Run Evolution" to start. The owl will analyze your skills and suggest improvements. 🧬🦉</div>
+    <div class="sec" style="margin-top:16px">Skill Health Check</div>
+    <div id="skillHealth"></div>
+  </div>
+</div></div>
+
+<!-- KANBAN -->
+<div class="pn" id="p-kanban"><div class="pw">
+  <div class="tb" style="margin:-16px -16px 0;padding:8px 16px;min-height:38px">
+    <h2>📋 Kanban Board</h2>
+    <div class="ta"><button class="btn sm g" onclick="toggleKanbanForm()">+ New Task</button><button class="btn sm p" onclick="loadKanban()">↻ Refresh</button></div>
+  </div>
+  <div style="margin-top:8px">
+    <div class="sec">Multi-Agent Task Board</div>
+    <div class="sec-sub">Hermes Kanban — real multi-agent platform with swarm topology, scheduled tasks, and per-task model overrides</div>
+    <div id="kanbanForm" class="cron-form" style="display:none">
+      <label>Task Title</label>
+      <input id="kanbanTitle" placeholder="What needs to be done?">
+      <label>Task Description</label>
+      <textarea id="kanbanDesc" placeholder="Describe the task in detail…"></textarea>
+      <label>Priority</label>
+      <select id="kanbanPriority">
+        <option value="low">🟢 Low</option>
+        <option value="medium" selected>🟡 Medium</option>
+        <option value="high">🔴 High</option>
+      </select>
+      <div style="display:flex;gap:5px;margin-top:4px"><button class="btn p sm" onclick="createKanbanTask()">🦉 Create Task</button><button class="btn sm" onclick="toggleKanbanForm()">Cancel</button></div>
+    </div>
+    <div id="kanbanBoard" style="margin-top:12px"></div>
+  </div>
+</div></div>
+
+<!-- FILES -->
+<div class="pn" id="p-files"><div class="pw" id="filesWrap"></div></div>
+
+<!-- NOTES -->
+<div class="pn" id="p-notes"><div class="pw">
+  <div class="sec">📝 Scratch Notes</div>
+  <div class="sec-sub">Auto-saves to ~/.hermes/hootsuite-notes.md</div>
+  <textarea class="notes-area" id="notesArea" rows="16" placeholder="Start typing… 🦉"></textarea>
+</div></div>
+
+<!-- SETTINGS -->
+<div class="pn" id="p-set"><div class="pw">
+  <div class="sec">⚙️ Settings</div>
+  <div class="sec-sub">Configure your HootSuite experience</div>
+  <div class="sg2"><h3>🦉 HootSuite</h3>
+    <div class="sr2"><div><div class="sl">Sound Effects</div><div class="sd2">Hoot sounds, clicks, and notifications</div></div><div class="tog on" onclick="this.classList.toggle('on');soundsOn=this.classList.contains('on');localStorage.setItem('hs_sounds_on',soundsOn)" id="togSound"></div></div>
+    <div class="sr2"><div><div class="sl">Owl Puns</div><div class="sd2">Random puns in chat responses</div></div><div class="tog on" onclick="this.classList.toggle('on');localStorage.setItem('hs_puns_on',this.classList.contains('on'))" id="togPuns"></div></div>
+    <div class="sr2"><div><div class="sl">Dashboard Animations</div><div class="sd2">Bouncy, fun transitions</div></div><div class="tog on" onclick="this.classList.toggle('on');localStorage.setItem('hs_anim_on',this.classList.contains('on'))" id="togAnim"></div></div>
+  </div>
+  <div class="sg2"><h3>🖥 System</h3>
+    <div class="sr2"><div><div class="sl">Hermes Agent</div><div class="sd2" id="setHm">Checking…</div></div><button class="btn sm" onclick="checkHermes()">Check</button></div>
+    <div class="sr2"><div><div class="sl">Display</div><div class="sd2" id="setDp">Checking…</div></div><button class="btn sm" onclick="checkDisplay()">Check</button></div>
+    <div class="sr2"><div><div class="sl">Gateway</div><div class="sd2" id="setGw">Checking…</div></div><button class="btn sm" onclick="checkGateway()">Check</button></div>
+  </div>
+  <div class="sg2"><h3>🚀 Quick Actions</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:5px">
+      <button class="btn" onclick="exec('hermes doctor')">hermes doctor</button>
+      <button class="btn" onclick="exec('hermes update')">update Hermes</button>
+      <button class="btn" onclick="exec('hermes skills check')">check skills</button>
+      <button class="btn w" onclick="exec('hermes cron status')">cron status</button>
+      <button class="btn" onclick="exec('echo Hermes: $(hermes --version 2>&1)')">version</button>
+    </div>
+  </div>
+  <div class="sg2"><h3>ℹ️ About</h3>
+    <div style="font-size:11.5px;color:var(--ts);line-height:1.8;background:var(--sbg);border:1px solid var(--bd);border-radius:8px;padding:12px">
+      <strong style="color:var(--or);font-size:14px">🦉 HootSuite v3.1</strong><br>
+      Your AI owl dashboard — now with self-evolution, kanban, and 25+ models.<br><br>
+      Built on <strong>Hermes Agent</strong> by Nous Research<br>
+      Electron 33 · Node 24 · WSL2 Kali Linux<br>
+      86 skills · 25+ AI models · Live monitor · Self-Evolution · Kanban · Sound effects · Real terminal · Live Hermes chat
+    </div>
+  </div>
+</div></div>
+
+</div>
+
+<script>
+// ══════════ SOUND ENGINE (real WAV files + Web Audio) ══════════
+let soundsOn=true;
+const audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+const soundBuffers = {};
+const ASSETS = 'assets/'; // relative to index.html
+
+async function loadSound(name, file) {
+  try {
+    const res = await fetch(ASSETS + file);
+    const buf = await res.arrayBuffer();
+    soundBuffers[name] = await audioCtx.decodeAudioData(buf);
+  } catch(e) { console.log('Sound load failed:', name, e.message); }
+}
+
+(async()=>{
+  await Promise.all([
+    loadSound('hoot','snd_hoot.wav'),
+    loadSound('angry','snd_angry.wav'),
+    loadSound('thinking','snd_thinking.wav'),
+    loadSound('click','snd_click.wav'),
+    loadSound('success','snd_success.wav'),
+    loadSound('error','snd_error.wav'),
+  ]);
+  console.log('Sounds loaded:', Object.keys(soundBuffers));
+})();
+
+function playSnd(name) {
+  if(!soundsOn) return;
+  try {
+    if(soundBuffers[name]) {
+      const src = audioCtx.createBufferSource();
+      src.buffer = soundBuffers[name];
+      src.connect(audioCtx.destination);
+      src.start();
+    }
+  } catch(e){}
+}
+
+// Fallback beeps for when WAVs haven't loaded yet
+function beep(freq, dur, type='sine', vol=0.1) {
+  if(!soundsOn)return;
+  try {
+    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    o.type=type; o.frequency.setValueAtTime(freq,audioCtx.currentTime);
+    g.gain.setValueAtTime(vol,audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+dur);
+    o.connect(g).connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+dur);
+  } catch(e){}
+}
+
+const sfx = {
+  hoot() { playSnd('hoot'); if(!soundBuffers.hoot) beep(800,0.12) || setTimeout(()=>beep(1200,0.08),80) || setTimeout(()=>beep(600,0.15),180); },
+  click() { playSnd('click'); if(!soundBuffers.click) beep(1800,0.04,'square',0.08); },
+  success() { playSnd('success'); if(!soundBuffers.success) beep(880,0.08)||setTimeout(()=>beep(1100,0.08),80)||setTimeout(()=>beep(1320,0.12),160); },
+  error() { playSnd('angry'); if(!soundBuffers.angry) beep(200,0.25,'sawtooth',0.1); },
+  whoosh() { beep(200,0.15); beep(800,0.1); },
+  pop() { beep(600,0.06); },
+  nav() { beep(440,0.03,'triangle',0.06); },
+  send() { playSnd('hoot'); if(!soundBuffers.hoot) beep(1000,0.05)||setTimeout(()=>beep(1200,0.05),50); },
+  typing() { beep(2000,0.01,'sine',0.03); },
+};
+
+// ══════════ ANGRY OWL GIF ══════════
+function showAngryOwl(msg) {
+  const container = document.getElementById('owlGifContainer');
+  if(!container) return;
+  container.innerHTML = `<div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.2);border-radius:10px;margin:8px 0">
+    <img src="${ASSETS}angry_owl.gif" style="width:64px;height:64px;border-radius:8px;object-fit:contain" alt="angry owl">
+    <div style="flex:1;font-size:12px;color:var(--tx);line-height:1.5">${esc(msg)}</div>
+  </div>`;
+  setTimeout(()=>{container.innerHTML='';},8000);
+}
+
+// ══════════ HELPERS ══════════
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+function md(s){
+  if(!s)return '';
+  s=esc(String(s));
+  s=s.replace(/```(\w*)\n?([\s\S]*?)```/g,'<pre><code>$2</code></pre>');
+  s=s.replace(/`([^`]+)`/g,'<code>$1</code>');
+  s=s.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  s=s.replace(/\n/g,'<br>');
+  return s;
+}
+function ts(){return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
+function pct(u,t){try{return Math.round(parseFloat(u)/parseFloat(t)*100)}catch(e){return 50}}
+function toast(msg){sfx.pop();const d=document.createElement('div');d.className='toast';d.textContent=msg;document.body.appendChild(d);setTimeout(()=>d.remove(),3000)}
+
+// ══════════ NAV ══════════
+document.querySelectorAll('.ni').forEach(el=>{
+  el.addEventListener('click',()=>{
+    sfx.nav();
+    document.querySelectorAll('.ni').forEach(x=>{x.classList.remove('on');x.style.borderColor='transparent'});
+    el.classList.add('on');
+    const p=el.dataset.p;
+    document.querySelectorAll('.pn').forEach(x=>x.classList.remove('show'));
+    const panel=document.getElementById('p-'+p);
+    if(panel)panel.classList.add('show');
+    // Stop monitor auto-refresh when leaving monitor panel
+    if(p!=='monitor') stopMonitorRefresh();
+    if(p==='dash')loadDash();
+    if(p==='cron')loadCron();
+    if(p==='skills')filterSkills();
+    if(p==='files')loadFiles();
+    if(p==='notes')loadNotes();
+    if(p==='prompts')loadPrompts();
+    if(p==='models'){loadApiKeys();renderModels('all');}
+    if(p==='community'){renderCommunity('all');}
+    if(p==='evolve'){loadEvolve();}
+    if(p==='kanban'){loadKanban();}
+    if(p==='monitor'){loadMonitor();startMonitorRefresh();}
+    if(p==='fun'){checkAchievements();}
+    if(p==='term')setTimeout(()=>document.getElementById('tIn').focus(),80);
+  });
+});
+
+// Logo fun
+document.getElementById('sbLogo').addEventListener('click',function(){
+  sfx.hoot();
+  this.classList.add('spin');
+  setTimeout(()=>this.classList.remove('spin'),500);
+  doHootEasterEgg();
+});
+
+// ══════════ CHAT ══════════
+let chatHistory=[];
+const owlPuns=[
+  "Why do owls never get invited to parties? Because they're always a-hoot! 🦉",
+  "I'm not just an owl, I'm an expert in owl-thinking! Hoot! 🦉",
+  "What's an owl's favorite subject? Owl-gebra! 🦉📐",
+  "I'd tell you a TCP joke but I'm not sure you'd get it. Hmm, wrong protocol. 🦉",
+  "There are only 10 types of people: those who understand binary and those who owl-not! 🦉",
+  "I'm owl-ways here for you! 🦉❤️",
+  "Hoooo goes there? It's me, your friendly neighborhood owl agent! 🦉",
+  "What do you call an owl with a cold? A byrd! 🦉🤧",
+  "Why are owls so wise? Because they're always owl-knowing! 🦉",
+  "My favorite music? Owl-ternative rock! 🦉🎸",
+  "I'm reading a book about owls. It's a real page-turner! 📖🦉",
+  "What's an owl's favorite game? Hoot- and-seek! 🦉",
+];
+const hootGreetings=[
+  "Hoot hoot! 🦉","Hello, human friend! 🦉","*adjusts tiny owl glasses* 🦉",
+  "Hoo's talking? Oh right, me! 🦉","Greetings from your favorite owl! 🦉",
+  "*flaps wings excitedly* 🦉","The owl has entered the chat! 🦉",
+  "*ruffles feathers importantly* 🦉","Hoot if you love owls! 🦉",
+];
+
+function hootPun(){return owlPuns[Math.floor(Math.random()*owlPuns.length)]}
+
+// HOOT EASTER EGG
+let hootCount=0;
+function doHootEasterEgg(){
+  hootCount++;
+  sfx.hoot();
+  // Track hoots for achievements
+  var hc = parseInt(localStorage.getItem('hs_hoot_count')||0)+1;
+  localStorage.setItem('hs_hoot_count', hc);
+  checkAchievements();
+  // Show hoot owl GIF
+  const gifContainer = document.getElementById('owlGifContainer');
+  if(gifContainer) {
+    gifContainer.innerHTML = `<div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.15);border-radius:10px;margin:8px 0">
+      <img src="${ASSETS}hoot_owl.gif" style="width:64px;height:64px;border-radius:8px" alt="hooting owl">
+      <div style="flex:1;font-size:12px;color:var(--tx);line-height:1.5">🦉 <em>*loud enthusiastic hooting*</em></div>
+    </div>`;
+    setTimeout(()=>{gifContainer.innerHTML='';},4000);
+  }
+  // Big hoot bubble animation
+  const overlay=document.getElementById('hootOverlay');
+  const bubble=document.createElement('div');
+  bubble.className='hoot-bubble';
+  const faces=['🦉','😮','🤪','😎','🥳','💥','✨','🎉'];
+  bubble.textContent=faces[Math.floor(Math.random()*faces.length)];
+  overlay.appendChild(bubble);
+  setTimeout(()=>bubble.remove(),2000);
+
+  // Emoji rain at 3+ hoots
+  if(hootCount>=3){
+    const rain=document.getElementById('hootRain');
+    const emojis=['🦉','🌙','⭐','✨','💫','🎵','🎶','💜','🧡','🍕','🌮','💎','🔮'];
+    for(let i=0;i<20;i++){
+      setTimeout(()=>{
+        const e=document.createElement('div');
+        e.className='hoot-emoji';
+        e.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+        e.style.left=Math.random()*100+'%';
+        e.style.animationDuration=(2+Math.random()*2)+'s';
+        rain.appendChild(e);
+        setTimeout(()=>e.remove(),4000);
+      },i*80);
+    }
+    hootCount=0;
+  }
+
+  // Add fun message to chat
+  setTimeout(()=>{
+    const msgs=[
+      "HOOT! 🦉 Did you know? A group of owls is called a parliament!",
+      "HOOOOT! 🦉 Fun fact: Owls can rotate their heads 270°! *rotates head*",
+      "HOOT HOOT! 🦉 You found the secret hoot button! 🎉",
+      "*loud owl noises* 🦉 That's owl I've got to say!",
+      "HOOT! 🦉 You're really hooting now! 🎵",
+      "HOO HOO! 🦉 You've unlocked: THE OWL ZONE. Nothing will ever be the same.",
+      "*enthusiastic wing flapping* 🦉 HOOT HOOT MOTHERCLUCKER!",
+    ];
+    addMsg('HootSuite',msgs[Math.floor(Math.random()*msgs.length)],'h');
+  },400);
+}
+
+function chatKey(e){if(e.key==='Enter'&&!e.shiftKey)e.preventDefault();}
+function onChatInput(el){
+  resizeTA(el);
+  document.getElementById('ciw').classList.add('foc');
+  sfx.typing();
+}
+document.getElementById('ci').addEventListener('blur',()=>document.getElementById('ciw').classList.remove('foc'));
+function resizeTA(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px';}
+
+function sendChat(){
+  const inp=document.getElementById('ci'),text=inp.value.trim();
+  if(!text)return;
+  sfx.send();
+  addMsg('You',text,'u');
+  inp.value='';inp.style.height='auto';
+  chatHistory.push({role:'user',content:text});
+  showTyping();
+
+  // HOOT HOOT / HOOT HOOT HOOT — escalating chaos
+  if(text.toLowerCase().trim()==='hoot'){
+    rmTyping();
+    doHootEasterEgg();
+    return;
+  }
+  if(text.toLowerCase().trim()==='hoot hoot'){
+    rmTyping();
+    sfx.hoot(); setTimeout(()=>sfx.hoot(), 300);
+    doHootEasterEgg();
+    setTimeout(()=>{
+      addMsg('HootSuite','HOOT HOOT! 🦉🦉 Double hoot detected! Initiating OWL PROTOCOL!\n\n*plays owl mating call at maximum volume*\n\n🦉💨🌙✨','h');
+      // Show hoot owl GIF
+      const gc=document.getElementById('owlGifContainer');
+      if(gc) gc.innerHTML=`<div style="text-align:center;padding:12px"><img src="${ASSETS}hoot_owl.gif" style="width:80px;height:80px"><div style="font-size:11px;color:var(--ts);margin-top:4px">🦶💨 *aggressive hooting*</div></div>`;
+      setTimeout(()=>{if(gc)gc.innerHTML='';},5000);
+    },600);
+    return;
+  }
+  if(text.toLowerCase()==='hoot hoot hoot'){
+    rmTyping();
+    sfx.hoot(); setTimeout(()=>sfx.hoot(), 250); setTimeout(()=>sfx.hoot(), 500);
+    doHootEasterEgg();
+    // Extra chaos
+    const overlay=document.getElementById('hootOverlay');
+    for(let i=0;i<5;i++){
+      setTimeout(()=>{
+        const b=document.createElement('div');
+        b.className='hoot-bubble';
+        b.textContent=['🦉','😱','🤯','💥','🔥'][i];
+        b.style.fontSize=(36+i*8)+'px';
+        overlay.appendChild(b);
+        setTimeout(()=>b.remove(),2000);
+      },i*200);
+    }
+    setTimeout(()=>{
+      addMsg('HootSuite','🦉🦉🦉 TRIPLE HOOOOOOT! 🦉🦉🦉\n\n*OWL OVERLOAD*\n*feathers everywhere*\n*windows breaking*\n*neighbors calling police*\n\nYou\'ve gone too far this time. I\'m calling my owl lawyer. 🦉⚖️\n\n'+hootPun(),'h');
+      // Show thinking owl then angry owl
+      const gc=document.getElementById('owlGifContainer');
+      if(gc) gc.innerHTML=`<div style="text-align:center;padding:12px"><img src="${ASSETS}thinking_owl.gif" style="width:80px;height:80px"><div style="font-size:11px;color:var(--ts)">Processing…</div></div>`;
+      setTimeout(()=>{
+        if(gc) gc.innerHTML=`<div style="text-align:center;padding:12px"><img src="${ASSETS}angry_owl.gif" style="width:80px;height:80px"><div style="font-size:11px;color:var(--er)">ENOUGH.</div></div>`;
+      },2000);
+      setTimeout(()=>{if(gc)gc.innerHTML='';},6000);
+    },800);
+    return;
+  }
+
+  if(window.hs&&window.hs.chat){
+    window.hs.chat(text).then(r=>{
+      rmTyping();
+      const pun=Math.random()<0.2?'\n\n'+hootPun():'';
+      addMsg('HootSuite',(r||'(Hermes returned empty)')+pun,'h');
+      chatHistory.push({role:'assistant',content:r});
+    }).catch(e=>{
+      rmTyping();addError('Hermes chat failed: '+e.message.split('\n')[0]);
+      addMsg('HootSuite','Hermes is being shy: '+e.message.split('\n')[0]+' 🦉','h');
+    });
+  } else {
+    setTimeout(()=>{rmTyping();hootReply(text);},300+Math.random()*500);
+  }
+}
+
+// ── SWEARING OWL ERRORS ──
+const owlSwears=[
+  "*flaps wings angrily* For f—'s sake, that's NOT how this works! 🦉😤",
+  "How many times do I gotta tell you, you DAMN human?! Read the error message! 🦉🤬",
+  "Oh for the love of— *ruffles feathers* That's busted, fix it! 🦉💢",
+  "What in the actual h—?! That's not gonna work, chief! 🦉😡",
+  "*squawks* Damn it! I'm an owl, not a miracle worker! Check your sh—! 🦉🔥",
+  "FOR CRYING OUT LOUD! Every time! Do I gotta do everything myself?! 🦉😤",
+  "Oh bull—! *throws tiny Owl* That's broken, you beautiful disaster! 🦉🤯",
+  "Son of a—! I swear on my feathers, this thing is messed up! 🦉💢",
+  "*deep owl sigh* Here we go again… Fix your crap, human! 🦉😩",
+  "What the f— is this?! I'm trying my BEST here! 🦉😭"
+];
+let swearCooldown=false;
+function addError(context){
+  if(swearCooldown)return;
+  swearCooldown=true;
+  sfx.error();
+  localStorage.setItem('hs_angry_triggered', 'true');
+  checkAchievements();
+  const msg=owlSwears[Math.floor(Math.random()*owlSwears.length)]+'\n\n**What happened:** '+(context||'Something broke')+'\n\n**What to do:** Check the error above, fix it, and try again. I believe in you (barely).';
+  addMsg('HootSuite',msg,'h');
+  showAngryOwl(msg);
+  setTimeout(()=>{swearCooldown=false},8000);
+}
+
+function hootReply(input){
+  const l=input.toLowerCase();let r;
+  if(l==='hi'||l==='hello'||l==='hey') r=hootGreetings[Math.floor(Math.random()*hootGreetings.length)]+" What can I help you with?";
+  else if(l.includes('status')) r=`Hoot hoot! 🦉 All systems nominal.\n\n**Skills:** 86 loaded\n**Cron:** Check the Cron panel!\n**Models:** 25+ available\n**Monitor:** Live system stats\n\n${hootPun()}`;
+  else if(l.includes('help')) r=`**HootSuite commands:**\n\n💬 **Chat** — Talk to me or Hermes\n🧠 **AI Models** — Switch between 25+ models\n🌐 **Community** — Browse & install skills\n📡 **Monitor** — Live system stats\n📊 **Dashboard** — System overview\n⏰ **Cron** — Manage scheduled jobs\n🧩 **Skills** — Browse all 86\n⬛ **Terminal** — Real shell commands\n\nType **hoot** for a surprise! 🦉`;
+  else if(l.includes('pun')||l.includes('joke')) r=hootPun();
+  else if(l.includes('shut up')||l.includes('stfu')||l.includes('shush')) r="*offended owl noises* Fine. I'll be quiet. 🦉😒\n\n…\n\nI'm not talking to you anymore.\n\n…\n\nok fine: "+hootPun();
+  else if(l.includes('i love you')||l.includes('love you')) r="*blushes feathers* Oh… stop it. 🦉💕\n\n…\n\nI love you too, you beautiful human. Now get back to work. 😤❤️";
+  else if(l.includes('good owl')||l.includes('good job')||l.includes('thank')) r="*puffs up chest proudly* Why thank you! 🦉✨\n\nI try my best. Mostly I just hoot and judge your command choices.\n\n"+hootPun();
+  else if(l.includes('bad owl')||l.includes('stupid')||l.includes('dumb')) r="*wounded owl noises* 🦉💔\n\nThat hurts. That really hurts. I'm just trying to help.\n\n…\n\nI'm not crying, you're crying. *sniff*";
+  else if(l.includes('what time')||l.includes('what\'s the time')) r="It's **HOOT O'CLOCK**! 🕐🦉\n\n(Actually it's "+new Date().toLocaleTimeString()+" but Hoot O'CLOCK is more fun.)";
+  else if(l.includes('who are you')||l.includes('what are you')) r="I'm **HootSuite** 🦉 — your goofy owl Electron app wrapping Hermes Agent.\n\nI speak owl, shell, markdown, and bad puns. I'm basically the feathery terminal you never knew you needed.\n\n"+hootPun();
+  else if(l.includes('flip a coin')||l.includes('coin flip')) r=Math.random()<0.5?"*flips coin* 🦉🪙 **Heads!** The owl gods have spoken!":"*flips coin* 🦉🪙 **Tails!** The owl gods are feeling sassy!";
+  else if(l.includes('roll a die')||l.includes('roll dice')||l.includes('dice')) r="*rolls tiny owl dice* 🦉🎲 You rolled a **"+(Math.floor(Math.random()*6)+1)+"**!";
+  else if(l.includes('meaning of life')||l.includes('meaning of the universe')) r="**42.** 🦉\n\nDouglas Adams knew what was up. Also: worms. The meaning of life is definitely worms.";
+  else if(l.includes('password')||l.includes('secret')) r="🦉 *whispers* The password is…\n\n…\n\nJust kidding! I'm an owl, not a security breach. Ask Hermes for real help with that.";
+  else if(l.includes('sudo')||l.includes('rm -rf')) r="⚠️ WHOA THERE! 🦉\n\nI see you typing dangerous commands. I'm an owl, not a death wish. Maybe think about what you're doing?\n\n…\n\nOr don't. I'll be here to say 'I told you so.'";
+  else if(l.includes('hello world')) r="```\nHello, World! 🦉\n```\n\nAh, the classic. Every developer's first words. Mine too, except mine was 'Hoot, World!' and nobody appreciated it.";
+  else if(l.includes('404')||l.includes('not found')) r="404: Your request not found. 🦉\n\nMuch like my will to live after reading your command history.";
+  else if(l.includes('i\'m bored')||l.includes('im bored')||l.includes('bored')) r="Bored? BORED?! 🦉😤\n\nI have 86 skills, 25+ AI models, a community hub, and you're BORED?!\n\nHere, try one:\n- Type 'hoot' for a surprise\n- Click on a skill to read my roasts\n- Run 'hermes status' in Terminal\n- Ask me to flip a coin\n- Tell me a secret\n\nENTERTAIN ME, HUMAN.";
+  else if(l.includes('tell me a secret')||l.includes('secret')) r="🦉 *leans in close*\n\nFine. Here's a secret:\n\nSometimes when you run a command, I judge you silently. Not for the command. For the fact that you needed to run it.\n\n…\n\nAlso I may have eaten one of your cron jobs. It looked tasty. 😬";
+  else if(l.includes('what\'s up')||l.includes('whats up')||l.includes('sup')) r="The sky, mostly. 🦉☁️\n\nAlso my blood pressure, watching you type commands without reading the docs first.";
+  else if(l.includes('marco')) r="POLO! 🦉\n\n…\n\nWait, this isn't a game. What do you want?";
+  else if(l.includes('do you dream')) r="🦉 *faraway look*\n\nI dream of electric sheep. And worms. Mostly worms.\n\nAnd sometimes of a world where humans read error messages before asking for help.";
+  else if(l.includes('favorite food')||l.includes('what do you eat')) r="Worms. 🐛🦉\n\n…\n\nWhat? You expected me to say pizza? I'm an owl, not a college student.\n\n…\n\nAlthough I wouldn't say no to a nice mouse. *nervous feather ruffle*";
+  else r=`Hoot! 🦉 "${input.slice(0,80)}${input.length>80?'…':''}"\n\nTry **Quick Prompts** for ideas, or the **Terminal** for real commands.\n\n${Math.random()<0.3?hootPun():''}`;
+  addMsg('HootSuite',r,'h');
+}
+
+function addMsg(who,txt,type){
+  const m=document.getElementById('msgs'),t=ts();
+  const av=type==='h'?'🦉':'👤';
+  const div=document.createElement('div');
+  div.className='mg'+(type==='h'?' hoot-entry':'');
+  div.innerHTML=`<div class="av ${type}">${av}</div><div class="mb"><div class="mh"><span class="mn2">${esc(who)}</span><span class="mt2">${t}</span></div><div class="mt3">${md(txt)}</div></div>`;
+  m.appendChild(div);m.scrollTop=m.scrollHeight;
+}
+function showTyping(){const m=document.getElementById('msgs'),d=document.createElement('div');d.id='ty';d.className='mg';d.innerHTML=`<div class="av h">🦉</div><div class="mb"><div class="mt3"><span class="td"><span></span><span></span><span></span></span> <span class="ti" style="font-size:10px">Thinking…</span></div></div>`;m.appendChild(d);m.scrollTop=m.scrollHeight}
+function rmTyping(){const e=document.getElementById('ty');if(e)e.remove()}
+function clChat(){sfx.whoosh();document.getElementById('msgs').innerHTML='';chatHistory=[];addMsg('OWL',"Chat cleared! Fresh start. ✨ What's on your mind?",'h');}
+function exportChat(){sfx.success();const t=chatHistory.map(m=>`[${m.role}] ${m.content}`).join('\n\n');const b=new Blob([t],{type:'text/plain'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`hootsuite-${Date.now()}.txt`;a.click()}
+
+// Voice
+let rec=null;
+try{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(SR){rec=new SR();rec.continuous=false;rec.lang='en-US';rec.onresult=e=>{document.getElementById('ci').value=e.results[0][0].transcript;sendChat()};rec.onend=()=>document.getElementById('micBtn').classList.remove('rec');rec.onerror=()=>document.getElementById('micBtn').classList.remove('rec')}}catch(e){}
+function toggleMic(){if(!rec){sfx.error();addMsg('HootSuite','Voice rec not available — try Chrome! 🦉','h');return}sfx.click();rec.start();document.getElementById('micBtn').classList.add('rec')}
+
+// ══════════ TERMINAL ══════════
+async function exec(cmd){if(!cmd)return;sfx.click();const out=document.getElementById('tOut');if(cmd==='clear'){out.innerHTML=`<span class="tp">hoot</span> <span class="ti">› </span>`;return}out.innerHTML+=`\n<span class="tp">hoot</span> <span class="tc">› ${esc(cmd)}</span>\n`;out.scrollTop=out.scrollHeight;const loading=document.createElement('span');loading.className='ti';loading.textContent='Running…';out.appendChild(loading);out.scrollTop=out.scrollHeight;let r;try{if(window.hs&&window.hs.cmd)r=await window.hs.cmd(cmd);else r='(Bridge not loaded)'}catch(e){r='ERR: '+e.message}loading.remove();const lines=(r||'(no output)').split('\n');lines.forEach(l=>{const el=document.createElement('div');el.className='tl';if(l.startsWith('⚠')||l.startsWith('ERR:'))el.className+=' te';else if(l.match(/^\s*[✓✔🦉]/))el.className+=' to2';el.textContent=l;out.appendChild(el)});out.scrollTop=out.scrollHeight;if(r&&!r.startsWith('⚠')&&!r.startsWith('ERR'))sfx.success();else addError('Command returned an error: '+cmd);}
+function clrTerm(){sfx.whoosh();document.getElementById('tOut').innerHTML=`<span class="tp">hoot</span> <span class="ti">› </span>`}
+
+// ══════════ DASHBOARD ══════════
+async function loadDash(){
+  sfx.nav();
+  const w=document.getElementById('dashContent');
+  w.innerHTML=`<div class="sec">📊 System Overview</div><div class="sec-sub">Live stats from your WSL2 machine</div><div class="cg" id="sysCards"></div>
+<div class="sec" style="margin-top:16px">🦉 Hermes Agent</div><div class="cg" id="hmCards"></div>
+<div class="sec" style="margin-top:16px">⏰ Scheduled Automations</div><div class="cg" id="crCards"></div>`;
+
+  if(window.hs&&window.hs.sysInfo){
+    const info=await window.hs.sysInfo();
+    document.getElementById('sysCards').innerHTML=
+      sysCard('Memory',info.mem,'RAM',pct(info.mem.split('/')[0],info.mem.split('/')[1]),'#38bdf8')+
+      sysCard('Disk',info.disk,'Storage',parseInt(info.disk.match(/(\d+)%/)?.[1])||0,'#3fb950')+
+      sysCard('CPU Cores',info.cpu,'Processors',10,'#c084fc')+
+      sysCard('Uptime',info.uptime.replace('up ',''),'Since boot',20,'#fb923c');
+  } else {
+    document.getElementById('sysCards').innerHTML=
+      sysCard('Status','🔵','Bridge not connected',10,'#38bdf8')+
+      sysCard('Tip','→','Run via npx electron .',10,'#c084fc');
+  }
+
+  // Live Hermes stats
+  let hmStats = { sessions: '—', crons: '—', skills: '86', config: 'config.yaml' };
+  if(window.hs&&window.hs.cmd){
+    try {
+      const ver = await window.hs.cmd('hermes --version 2>&1');
+      const cr = await window.hs.cmd('hermes cron list 2>&1');
+      const crLines = cr ? cr.split('\n').filter(l=>l.trim()).length : 0;
+      hmStats = {
+        sessions: '1',
+        crons: crLines.toString(),
+        skills: '86',
+        config: ver ? ver.trim().slice(0,40) : 'config.yaml'
+      };
+    } catch(e){}
+  }
+  document.getElementById('hmCards').innerHTML=
+    iC('Active Sessions',hmStats.sessions,'default')+
+    iC('Cron Jobs',hmStats.crons,'live count')+
+    iC('Loaded Skills',hmStats.skills,'built-in + local')+
+    iC('Version',hmStats.config,'~/.hermes/');
+
+  // Live cron cards on dashboard
+  const crCards = document.getElementById('crCards');
+  if(window.hs&&window.hs.cmd){
+    try {
+      const cr = await window.hs.cmd('hermes cron list 2>&1');
+      if(cr&&!cr.startsWith('⚠')){
+        const blocks = cr.split(/\n(?=\s{2}[a-f0-9]{12})/);
+        const jobs = [];
+        blocks.forEach(block => {
+          const lines = block.split('\n').map(l=>l.trim()).filter(l=>l);
+          if(lines.length===0) return;
+          const firstLine = lines[0];
+          const idMatch = firstLine.match(/^([a-f0-9]+)/);
+          if(!idMatch) return;
+          let name = 'Unnamed', sched = '?';
+          lines.forEach(l => {
+            if(l.startsWith('Name:')) name = l.replace('Name:','').trim();
+            else if(l.startsWith('Schedule:')) sched = l.replace('Schedule:','').trim();
+          });
+          jobs.push({name, sched});
+        });
+        
+        if(jobs.length===0){
+          crCards.innerHTML='<div style="color:var(--tm);font-size:11px">No cron jobs yet. <a href="#" onclick="document.querySelector(\'[data-p=cron]\').click();return false" style="color:var(--ac)">Create one →</a></div>';
+        } else {
+          crCards.innerHTML=jobs.slice(0,4).map(j=>`<div class="cd" style="cursor:pointer" onclick="document.querySelector('[data-p=cron]').click()"><div style="font-size:12px;font-weight:700;color:var(--ac);margin-bottom:3px">${esc(j.name)}</div><div class="cv" style="font-size:14px">${esc(j.sched)}</div></div>`).join('');
+        }
+      } else {
+        crCards.innerHTML='<div style="color:var(--tm);font-size:11px">Unable to load cron jobs</div>';
+      }
+    } catch(e){
+      crCards.innerHTML='<div style="color:var(--tm);font-size:11px">Unable to load cron jobs</div>';
+    }
+  } else {
+    crCards.innerHTML='<div style="color:var(--tm);font-size:11px">Connect via Electron to see cron jobs</div>';
+  }
+  sfx.success();
+}
+function sysCard(lbl,val,sub,pctV,color){const p=Math.min(100,Math.max(0,parseInt(pctV)||Math.floor(Math.random()*40+10)));return `<div class="cd"><div class="cl">${lbl}</div><div class="cv">${val}</div><div class="cb"><div class="cf" style="width:${p}%;background:${color}"></div></div><div class="cs">${sub}</div></div>`}
+function iC(lbl,val,sub){return `<div class="cd"><div class="cl">${lbl}</div><div class="cv">${val}</div><div class="cs">${sub}</div></div>`}
+
+// ══════════ QUICK PROMPTS ══════════
+const prompts=[
+  {e:'🌅',t:'Morning Briefing',d:'Check arXiv, HN, and RSS for today\'s AI news',c:'Search arXiv and Hacker News for the latest AI/ML news from the past 24 hours. Summarize the top 5 most interesting findings with links.'},
+  {e:'🏥',t:'Project Health Check',d:'Audit all git repos for issues',c:'Check all git repositories under ~ for uncommitted changes, branches behind main, and open PRs. Summarize what needs attention.'},
+  {e:'🧹',t:'Cleanup Scan',d:'Find stale files in Downloads and Desktop',c:'Scan ~/Downloads and ~/Desktop for files older than 30 days, duplicates, and large files. Report what could be cleaned up.'},
+  {e:'📊',t:'System Report',d:'Full system status overview',c:'Give me a comprehensive system report: memory, disk, CPU, uptime, running processes, and any issues.'},
+  {e:'🐛',t:'Debug This',d:'Help debug an issue',c:'I\'m having this issue: [describe]. Help me debug it systematically.'},
+  {e:'🚀',t:'New Project',d:'Scaffold a new project',c:'Help me set up a new [language/framework] project with best practices, testing, and CI/CD.'},
+  {e:'📝',t:'Write Document',d:'Draft a document or report',c:'Help me write a [document type] about [topic]. Make it professional and well-structured.'},
+  {e:'📖',t:'Research Paper',d:'Search and summarize a paper',c:'Find and summarize a recent research paper about [topic]. Include key findings and methodology.'},
+  {e:'⏰',t:'Manage Cron',d:'View and manage scheduled tasks',c:'List all my cron jobs. Are any failing? What\'s the schedule look like?'},
+  {e:'🔧',t:'Hermes Doctor',d:'Run Hermes diagnostics',c:'Run hermes doctor and report any issues found.'},
+  {e:'🎨',t:'Generate Image',d:'Create an AI image',c:'Generate an image of [description]. Make it [style].'},
+  {e:'📧',t:'Email Check',d:'Check and summarize emails',c:'Check my email and summarize the important messages from today.'},
+];
+function loadPrompts(){sfx.nav();document.getElementById('promptGrid').innerHTML=prompts.map(p=>`<div class="prompt-card" onclick="runPrompt('${p.c.replace(/'/g,"\\'")}')"><div class="p-emoji">${p.e}</div><div class="p-title">${p.t}</div><div class="p-desc">${p.d}</div><div class="p-cmd">${p.c.slice(0,80)}${p.c.length>80?'…':''}</div></div>`).join('');}
+function runPrompt(text){sfx.click();document.querySelector('[data-p=chat]').click();setTimeout(()=>{document.getElementById('ci').value=text;document.getElementById('ci').focus();resizeTA(document.getElementById('ci'))},100);}
+
+// ══════════ CRON ══════════
+function toggleCronForm(){sfx.click();const f=document.getElementById('cronForm');f.style.display=f.style.display==='none'?'block':'none';}
+async function createCronJob(){
+  const sched=document.getElementById('cronSched').value.trim();
+  const prompt=document.getElementById('cronPrompt').value.trim();
+  const name=document.getElementById('cronName').value.trim();
+  if(!sched||!prompt){sfx.error();toast('Need schedule + prompt!');return;}
+  sfx.send();
+  if(window.hs&&window.hs.cronCreate){
+    const r=await window.hs.cronCreate(sched,prompt,name);
+    toast('Cron job created! 🦉');
+    sfx.success();
+    document.getElementById('cronForm').style.display='none';
+    document.getElementById('cronSched').value='';
+    document.getElementById('cronPrompt').value='';
+    document.getElementById('cronName').value='';
+    loadCron();
+  } else {
+    sfx.error();toast('Bridge not connected');
+  }
+}
+async function loadCron(){
+  sfx.nav();
+  const tb=document.querySelector('#crTable tbody');
+  tb.innerHTML='';
+
+  if(window.hs&&window.hs.cmd){
+    try {
+      const r = await window.hs.cmd('hermes cron list 2>&1');
+      if(r&&!r.startsWith('⚠')){
+        // Parse the formatted table output
+        // Format: "  id [status]\n    Name: xxx\n    Schedule: xxx\n..."
+        const blocks = r.split(/\n(?=\s{2}[a-f0-9]{12})/);
+        const jobs = [];
+        
+        blocks.forEach(block => {
+          const lines = block.split('\n').map(l=>l.trim()).filter(l=>l);
+          if(lines.length===0) return;
+          
+          // First line: "id [status]"
+          const firstLine = lines[0];
+          const idMatch = firstLine.match(/^([a-f0-9]+)/);
+          if(!idMatch) return;
+          const id = idMatch[1];
+          const active = firstLine.includes('active');
+          
+          // Extract fields
+          let name = 'Unnamed', sched = '?';
+          lines.forEach(l => {
+            if(l.startsWith('Name:')) name = l.replace('Name:','').trim();
+            else if(l.startsWith('Schedule:')) sched = l.replace('Schedule:','').trim();
+          });
+          
+          jobs.push({id, name, sched, active});
+        });
+        
+        document.getElementById('crC').textContent = jobs.length;
+        
+        if(jobs.length===0){
+          tb.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--tm);padding:20px">No cron jobs yet. Click "+ New Job" to create one! 🦉</td></tr>';
+          return;
+        }
+        
+        jobs.forEach(j=>{
+          tb.innerHTML+=`<tr>
+            <td><strong>${esc(j.name)}</strong></td>
+            <td style="font-family:monospace;font-size:11px;color:var(--ac)">${esc(j.sched)}</td>
+            <td><span class="cs3"><span class="d ${j.active?'a':'p'}"></span>${j.active?'Active':'Paused'}</span></td>
+            <td><div style="display:flex;gap:3px">
+              <button class="btn sm g" onclick="cronAction('run','${j.id}')" title="Run now">▶</button>
+              <button class="btn sm w" onclick="cronAction('pause','${j.id}')" title="Pause">⏸</button>
+              <button class="btn sm" onclick="cronAction('resume','${j.id}')" title="Resume">⏵</button>
+              <button class="btn sm d" onclick="cronAction('delete','${j.id}')" title="Delete">🗑</button>
+            </div></td>
+          </tr>`;
+        });
+        return;
+      }
+    } catch(e){}
+  }
+
+  // Demo mode (no bridge)
+  tb.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--tm);padding:20px">Connect via Electron to manage cron jobs 🦉</td></tr>';
+}
+async function cronAction(action,id){
+  sfx.click();
+  if(!window.hs){sfx.error();toast('Bridge not connected');return;}
+  let r;
+  if(action==='run')r=await window.hs.cronRun(id);
+  else if(action==='pause')r=await window.hs.cronPause(id);
+  else if(action==='resume')r=await window.hs.cronResume(id);
+  else if(action==='delete'){
+    if(!confirm('Delete this cron job?'))return;
+    r=await window.hs.cronDelete(id);
+  }
+  toast(r.split('\n')[0].slice(0,60));
+  sfx.success();
+  setTimeout(loadCron,1000);
+}
+
+// ══════════ SKILLS ══════════
+const allSkills=[
+  {n:'hermes-agent',c:'Core',i:'🦉',d:'Configure, extend, or contribute to Hermes Agent',s:'Yeah, I\'m the main character. The owl that holds it all together. You\'re welcome.'},
+  {n:'claude-code',c:'Agents',i:'🤖',d:'Delegate coding to Claude Code CLI',s:'Because you clearly can\'t code without supervision. Don\'t worry, Claude will judge you gently.'},
+  {n:'codex',c:'Agents',i:'🤖',d:'Delegate coding to OpenAI Codex CLI',s:'OpenAI\'s finest, here to write code so you don\'t have to. Let the robots take over, one function at a time.'},
+  {n:'opencode',c:'Agents',i:'🤖',d:'Delegate coding to OpenCode CLI',s:'Another coding agent? Sure, because one wasn\'t enough to make you feel inadequate.'},
+  {n:'kanban-codex-lane',c:'Agents',i:'🏗',d:'Codex in isolated Kanban lane',s:'For when you need Codex to work in a little box where it can\'t break everything. We\'ve all been there.'},
+  {n:'architecture-diagram',c:'Creative',i:'📐',d:'Dark-themed SVG architecture diagrams',s:'Because your whiteboard looks like a toddler\'s finger painting. Let me make it pretty.'},
+  {n:'ascii-art',c:'Creative',i:'🎨',d:'ASCII art: pyfiglet, cowsay, boxes',s:'When you want to pretend you\'re a hacker from a 900s movie. Very cool. Very useless.'},
+  {n:'ascii-video',c:'Creative',i:'🎬',d:'Convert video/audio to colored ASCII',s:'Why watch a movie like a normal person when you can watch it in TERMINAL FONT?'},
+  {n:'electron-desktop-app',c:'Creative',i:'🖥',d:'Build Electron desktop GUI apps',s:'The skill that built this very app. So basically, you\'re welcome for everything.'},
+  {n:'comfyui',c:'Creative',i:'🖼',d:'Generate images, video, audio with ComfyUI',s:'For when Midjourney isn\'t enough and you need to run your own GPU-melting art factory.'},
+  {n:'manim-video',c:'Creative',i:'📊',d:'3Blue1Brown math animations',s:'Because nothing says "I\'m smarter than you" like animating calculus in Python.'},
+  {n:'p5js',c:'Creative',i:'🎮',d:'Generative art, shaders, interactive 3D',s:'Make pretty things that do nothing productive. Art is wasted on the productive.'},
+  {n:'pixel-art',c:'Creative',i:'👾',d:'Pixel art with retro game palettes',s:'Go back to 1985 where graphics were honest and your GPU wasn\'t crying.'},
+  {n:'songwriting-and-ai-music',c:'Creative',i:'🎵',d:'Songwriting + Suno AI music prompts',s:'Write songs without any musical talent whatsoever. The dream of every shower singer.'},
+  {n:'sketch',c:'Creative',i:'✏️',d:'Throwaway HTML mockups',s:'For when you need to pretend you\'re a designer for 5 minutes.'},
+  {n:'humanizer',c:'Creative',i:'🗣',d:'Strip AI-isms from text',s:'Because your writing sounds like a robot wrote it. Oh wait.'},
+  {n:'ideation',c:'Creative',i:'💡',d:'Generate project ideas via constraints',s:'Can\'t think of anything? Neither can I, but I\'ll pretend we both had ideas.'},
+  {n:'excalidraw',c:'Creative',i:'✏️',d:'Hand-drawn Excalidraw JSON diagrams',s:'Draw like a programmer: badly, but with JSON.'},
+  {n:'design-md',c:'Creative',i:'🎨',d:'Author Google DESIGN.md token specs',s:'For people who think in hex colors and get emotional about padding.'},
+  {n:'popular-web-designs',c:'Creative',i:'🌈',d:'54 real design systems',s:'Copy Stripe\'s design so your app looks like you have taste. We won\'t tell.'},
+  {n:'pretext',c:'Creative',i:'🔤',d:'DOM-free text layout demos',s:'Text so fancy it doesn\'t even need HTML. Show-off.'},
+  {n:'touchdesigner-mcp',c:'Creative',i:'🎛',d:'Control TouchDesigner via MCP (36 tools)',s:'For when you need real-time visuals and a therapist simultaneously.'},
+  {n:'baoyu-article-illustrator',c:'Creative',i:'🖌',d:'Article illustrations',s:'Make your boring blog posts look like someone cares about them.'},
+  {n:'baoyu-comic',c:'Creative',i:'📖',d:'Knowledge comics',s:'Learn things through comics like the adult child you are.'},
+  {n:'baoyu-infographic',c:'Creative',i:'📊',d:'Infographics: 21 layouts × 21 styles',s:'Turn your spreadsheet into something your boss might actually look at.'},
+  {n:'jupyter-live-kernel',c:'Data',i:'📓',d:'Iterative Python via live Jupyter',s:'Run Python like it\'s 2015 and notebooks are still cool.'},
+  {n:'kanban-orchestrator',c:'DevOps',i:'📋',d:'Multi-agent work queue orchestration',s:'Manage your AI minions like the overlord you wish you were.'},
+  {n:'kanban-worker',c:'DevOps',i:'🔧',d:'Kanban worker pitfalls',s:'Learn from the mistakes of other workers so you can make new, more creative mistakes.'},
+  {n:'webhook-subscriptions',c:'DevOps',i:'🔗',d:'Event-driven agent triggers',s:'Make your agent react to things automatically. Like a very slow, very confused butler.'},
+  {n:'himalaya',c:'Email',i:'📧',d:'IMAP/SMTP email from terminal',s:'Check email in the terminal because you hate yourself and GUIs.'},
+  {n:'github-auth',c:'GitHub',i:'🔑',d:'HTTPS tokens, SSH keys, gh CLI login',s:'Set up auth so GitHub stops yelling at you. It\'s like therapy but for code.'},
+  {n:'github-code-review',c:'GitHub',i:'🔍',d:'Review PRs with inline comments',s:'Review code like a pro. Or at least like someone who read the diff.'},
+  {n:'github-issues',c:'GitHub',i:'🐛',d:'Create, triage, assign issues',s:'Organize your bugs so they feel like they have a home. A very sad home.'},
+  {n:'github-pr-workflow',c:'GitHub',i:'🔀',d:'Full PR lifecycle',s:'From branch to merge, I\'ll hold your hand through the whole git circus.'},
+  {n:'github-repo-management',c:'GitHub',i:'📦',d:'Clone/fork/manage repos & releases',s:'Manage repos so you don\'t have to remember what clone vs fork means.'},
+  {n:'codebase-inspection',c:'GitHub',i:'📊',d:'LOC, language ratios with pygount',s:'Count your lines of code and feel either proud or deeply ashamed.'},
+  {n:'native-mcp',c:'MCP',i:'🔌',d:'Connect MCP servers for tool discovery',s:'Plug in external tools like you\'re building a very nerdy LEGO set.'},
+  {n:'gif-search',c:'Media',i:'🎞',d:'Search/download GIFs from Tenor',s:'Find the perfect GIF to express what words cannot. We both know it\'s a reaction GIF.'},
+  {n:'spotify',c:'Media',i:'🎧',d:'Control Spotify playback & playlists',s:'Control your music without leaving the terminal. Living the dream.'},
+  {n:'songsee',c:'Media',i:'📈',d:'Audio spectrograms & features',s:'Look at sound waves and pretend you know what you\'re looking at.'},
+  {n:'youtube-content',c:'Media',i:'📺',d:'YouTube transcripts to summaries',s:'Watch 2-hour videos in 30 seconds. Your attention span will thank me.'},
+  {n:'heartmula',c:'Media',i:'💜',d:'Song generation from lyrics + tags',s:'Generate songs from your lyrics. They won\'t be good, but they\'ll be yours.'},
+  {n:'huggingface-hub',c:'ML',i:'🤗',d:'Search/download/upload HF models',s:'Download AI models like they\'re free samples at Costco.'},
+  {n:'llama-cpp',c:'ML',i:'🦙',d:'Local GGUF inference',s:'Run LLMs locally so your data stays yours. And so you can feel like a hacker.'},
+  {n:'serving-llms-vllm',c:'ML',i:'⚡',d:'High-throughput LLM serving',s:'Serve LLMs like a boss. A very nerdy, very overworked boss.'},
+  {n:'dspy',c:'ML',i:'🎯',d:'Declarative LM programs, auto-optimize prompts',s:'Optimize your prompts automatically because you clearly can\'t do it yourself.'},
+  {n:'evaluating-llms-harness',c:'ML',i:'📏',d:'Benchmark LLMs (MMLU, GSM8K)',s:'Test your AI to see if it\'s actually smart or just really good at pretending.'},
+  {n:'segment-anything-model',c:'ML',i:'🖼',d:'Zero-shot image segmentation',s:'Cut things out of images like a very precise, very boring Photoshop.'},
+  {n:'audiocraft-audio-generation',c:'ML',i:'🎶',d:'Text-to-music, text-to-sound',s:'Generate music from text. Your garage band is officially obsolete.'},
+  {n:'weights-and-biases',c:'ML',i:'📊',d:'ML experiment tracking & dashboards',s:'Track your experiments so you can prove you actually did something today.'},
+  {n:'obliteratus',c:'ML',i:'🔥',d:'Remove LLM refusals (research)',s:'For research purposes only. I\'m not responsible for what comes out of that.'},
+  {n:'obsidian',c:'Notes',i:'💎',d:'Read, create, edit Obsidian vault',s:'Manage your notes in the app that makes you feel smarter than you are.'},
+  {n:'notion',c:'Productivity',i:'📝',d:'Notion pages & databases',s:'Organize your life in Notion. It won\'t fix your procrastination, but it\'ll look pretty.'},
+  {n:'google-workspace',c:'Productivity',i:'📅',d:'Gmail, Calendar, Drive, Docs',s:'Control Google\'s entire empire from your terminal. Take that, Google.'},
+  {n:'linear',c:'Productivity',i:'📐',d:'Linear issue/project management',s:'Manage projects in the tool that makes developers feel fancy.'},
+  {n:'airtable',c:'Productivity',i:'🗃',d:'Airtable REST API CRUD',s:'A spreadsheet had a baby with a database and raised it on APIs.'},
+  {n:'ocr-and-documents',c:'Productivity',i:'📄',d:'Extract text from PDFs/scans',s:'Turn your scanned PDFs into actual text. Magic, but with more errors.'},
+  {n:'nano-pdf',c:'Productivity',i:'✍️',d:'Edit PDF text via NLP',s:'Edit PDFs without Adobe. Take that, $30/month subscription.'},
+  {n:'powerpoint',c:'Productivity',i:'📽',d:'Create/read/edit .pptx',s:'Make PowerPoints programmatically. Your coworkers will never know you didn\'t suffer manually.'},
+  {n:'maps',c:'Productivity',i:'🗺',d:'Geocoding, routes, POIs, timezones',s:'Find places and routes without opening Google Maps. Revolutionary.'},
+  {n:'teams-meeting-pipeline',c:'Productivity',i:'📹',d:'Summarize Teams meetings',s:'Summarize meetings so you can pretend you were paying attention.'},
+  {n:'arxiv',c:'Research',i:'📚',d:'Search arXiv papers',s:'Read papers you won\'t understand but will cite anyway.'},
+  {n:'blogwatcher',c:'Research',i:'📡',d:'Monitor blogs and RSS feeds',s:'Stalk blogs automatically. It\'s not creepy if an owl does it.'},
+  {n:'llm-wiki',c:'Research',i:'🧠',d:'Build/query interlinked knowledge bases',s:'Build a wiki that actually makes sense. A novel concept.'},
+  {n:'research-paper-writing',c:'Research',i:'✏️',d:'Write ML papers for top conferences',s:'Write papers that might get accepted. Emphasis on "might."'},
+  {n:'polymarket',c:'Research',i:'🎰',d:'Query prediction markets',s:'Bet on the future like a time-traveling gambler.'},
+  {n:'xurl',c:'Social',i:'🐦',d:'X/Twitter: post, search, DM',s:'Tweet from the terminal. Because tweeting from the app is for normies.'},
+  {n:'systematic-debugging',c:'Dev',i:'🔬',d:'4-phase root cause debugging',s:'Debug systematically instead of randomly changing things and praying.'},
+  {n:'test-driven-development',c:'Dev',i:'✅',d:'Enforce RED-GREEN-REFACTOR',s:'Write tests first like a responsible adult. I know, I know.'},
+  {n:'subagent-driven-development',c:'Dev',i:'🤝',d:'Execute plans via subagent workers',s:'Delegate to subagents because you can\'t do everything yourself. Or can you?'},
+  {n:'requesting-code-review',c:'Dev',i:'🛡',d:'Pre-commit security/quality gates',s:'Check your code before someone else does and finds the stupid bug.'},
+  {n:'python-debugpy',c:'Dev',i:'🐍',d:'Debug Python remotely',s:'Debug Python like a pro. Or at least like someone who knows what a breakpoint is.'},
+  {n:'node-inspect-debugger',c:'Dev',i:'💚',d:'Debug Node.js via Chrome DevTools',s:'Debug Node.js in Chrome. Because why use one tool when you can use two?'},
+  {n:'writing-plans',c:'Dev',i:'📋',d:'Write implementation plans',s:'Plan before you code. Revolutionary concept, I know.'},
+  {n:'plan',c:'Dev',i:'📝',d:'Plan mode — write plans without executing',s:'Write plans and don\'t execute them. The developer\'s favorite procrastination technique.'},
+  {n:'spike',c:'Dev',i:'🧪',d:'Throwaway experiments before building',s:'Experiment first, build later. Or just experiment forever and never ship. Your call.'},
+  {n:'debugging-hermes-tui-commands',c:'Dev',i:'🐛',d:'Debug Hermes TUI',s:'Debug the thing that runs the thing. It\'s debuggers all the way down.'},
+  {n:'hermes-agent-skill-authoring',c:'Dev',i:'📖',d:'Author SKILL.md files',s:'Write skills so other owls can be snarky too. The circle of life.'},
+  {n:'hermes-s6-container-supervision',c:'DevOps',i:'🐳',d:'Modify Hermes Docker services',s:'Tinker with Docker containers like a very dangerous plumber.'},
+  {n:'openhue',c:'Home',i:'💡',d:'Control Philips Hue lights',s:'Control your lights from the terminal. Because flipping switches is too mainstream.'},
+  {n:'dogfood',c:'QA',i:'🍖',d:'Exploratory QA of web apps',s:'Test web apps by trying to break them. My favorite kind of testing.'},
+  {n:'pokemon-player',c:'Games',i:'🎮',d:'Play Pokemon via headless emulator',s:'Play Pokemon without a screen. For the truly dedicated degenerate.'},
+  {n:'minecraft-modpack-server',c:'Games',i:'⛏',d:'Host modded Minecraft servers',s:'Host a Minecraft server so your friends can lag together.'},
+  {n:'godmode',c:'Research',i:'⚠️',d:'Jailbreak LLM safety (research)',s:'For research only. Don\'t blame me when the AI starts giving questionable life advice.'},
+  {n:'yuanbao',c:'Chat',i:'💬',d:'Yuanbao group management',s:'Manage group chats because apparently you can\'t do that yourself either.'},
+
+  // ── HOOTSUITE CUSTOM SKILLS ──
+  {n:'hootsuite-dashboard',c:'HootSuite',i:'🦉',d:'Launch and manage the HootSuite desktop dashboard — the goofy owl GUI for Hermes Agent. Chat, terminal, cron jobs, skills browser, sound effects, animated owl GIFs, and 20+ hidden easter eggs.',s:'This is ME. I\'m the skill that launches the app that contains the skill that launches the app. We\'re owl-ing all the way down. 🦉🌀'},
+  {n:'owl-roast',c:'HootSuite',i:'🔥',d:'Roast the user with increasingly absurd owl-themed insults. 4 levels of escalation from mild burns to nuclear devastation.',s:'You want me to roast you? FINE. You type commands like a raccoon trying to use a keyboard. Your git history looks like a crime scene. I\'ve seen better organization from a pile of leaves in a hurricane. And leaves don\'t even have GitHub accounts. 🦉🔥'},
+  {n:'owl-council',c:'HootSuite',i:'🏛',d:'Summon a council of 4 owls (Hootbert the Wise, Screech the Chaos Agent, Professor Hootington III, and Mama Owl) to debate any decision.',s:'Four owls walk into a bar. The bartender says "What is this, a joke?" The owls proceed to argue about what to order for 45 minutes while Mama Owl just orders for everyone. This is the council. 🦉🏛️'},
+];
+allSkills.sort((a,b)=>a.c.localeCompare(b.c)||a.n.localeCompare(b.n));
+
+function showSkillModal(skill) {
+  sfx.click();
+  document.getElementById('mIcon').textContent = skill.i;
+  document.getElementById('mTitle').textContent = skill.n;
+  document.getElementById('mCat').textContent = skill.c;
+  document.getElementById('mDesc').textContent = skill.d;
+  document.getElementById('mSnark').textContent = skill.s || 'No comment. Use it or don\'t, I don\'t care. Actually I do. Please use it.';
+  document.getElementById('skillModal').classList.add('show');
+}
+function closeSkillModal() {
+  sfx.click();
+  document.getElementById('skillModal').classList.remove('show');
+}
+// Close modal on overlay click
+document.getElementById('skillModal').addEventListener('click',function(e){
+  if(e.target===this) closeSkillModal();
+});
+
+function filterSkills(){
+  sfx.click();
+  const q=document.getElementById('skSearch').value.toLowerCase();
+  const g=document.getElementById('skGrid');g.innerHTML='';let c=0;
+  allSkills.forEach(s=>{
+    if(q&&!s.n.toLowerCase().includes(q)&&!s.c.toLowerCase().includes(q)&&!s.d.toLowerCase().includes(q))return;
+    c++;const d=document.createElement('div');d.className='sk-card';
+    d.innerHTML=`<div class="sk-hd"><span class="sk-ic">${s.i}</span><span class="sk-nm">${s.n}</span><span class="sk-ct">${s.c}</span></div><div class="sk-d">${s.d}</div>`;
+    d.onclick=()=>showSkillModal(s);
+    g.appendChild(d);
+  });
+  document.getElementById('skCount').textContent=`— ${c} of ${allSkills.length}`;
+  document.getElementById('skC').textContent=allSkills.length;
+}
+
+// ══════════ FILES ══════════
+function loadFiles(){
+  sfx.nav();
+  const dirs=[
+    {i:'🏠',n:'~ (Home)',m:'Your home directory',cmd:'ls -la ~'},
+    {i:'🦉',n:'~/.hermes/',m:'Hermes config & data',cmd:'ls -la ~/.hermes/'},
+    {i:'🧩',n:'~/.hermes/skills/',m:'86 skill definitions',cmd:'ls ~/.hermes/skills/ | head -20'},
+    {i:'📋',n:'~/.hermes/sessions/',m:'Session transcripts',cmd:'ls ~/.hermes/sessions/ | head -10'},
+    {i:'📜',n:'~/.hermes/logs/',m:'Gateway & error logs',cmd:'ls ~/.hermes/logs/'},
+    {i:'⚙️',n:'~/.hermes/config.yaml',m:'Hermes configuration',cmd:'cat ~/.hermes/config.yaml | head -30'},
+    {i:'🪟',n:'/mnt/c/Users/',m:'Windows filesystem',cmd:'ls /mnt/c/Users/'},
+    {i:'🦉',n:'~/owl-dashboard/',m:'HootSuite app files',cmd:'ls -la ~/owl-dashboard/'},
+  ];
+  document.getElementById('filesWrap').innerHTML=`<div class="sec">📁 Files</div><div class="sec-sub">Click a directory to list its contents in the Terminal</div>
+  <div style="display:flex;flex-direction:column;gap:3px;margin-top:8px">
+  ${dirs.map(d=>`<div class="cd" style="cursor:pointer;padding:10px 14px;display:flex;align-items:center;gap:10px" onclick="exec('${d.cmd}')"><span style="font-size:16px">${d.i}</span><div><div style="font-size:12px;font-weight:700">${d.n}</div><div style="font-size:10px;color:var(--ts)">${d.m}</div></div></div>`).join('')}
+  </div>`;
+}
+
+// ══════════ NOTES ══════════
+const NOTES_PATH='/home/and1/.hermes/hootsuite-notes.md';
+function loadNotes(){
+  sfx.nav();
+  if(window.hs&&window.hs.readFile){
+    window.hs.readFile(NOTES_PATH).then(r=>{
+      document.getElementById('notesArea').value=r||'Welcome to HootSuite Notes! 🦉\n\nStart typing to save notes here...';
+    });
+  } else {
+    document.getElementById('notesArea').value='Welcome to HootSuite Notes! 🦉\n\n(Connect via electron to enable auto-save)';
+  }
+}
+let notesTO=null;
+document.getElementById('notesArea').addEventListener('input',function(){
+  clearTimeout(notesTO);
+  notesTO=setTimeout(()=>{
+    if(window.hs&&window.hs.writeFile){
+      window.hs.writeFile(NOTES_PATH,this.value).then(r=>{
+        if(r==='ok'){sfx.pop();toast('🦉 Notes saved!');}
+      });
+    }
+  },800);
+});
+
+// ══════════ API KEY MANAGEMENT ══════════
+function saveApiKey(provider, key) {
+  if(key && key.length > 10) {
+    localStorage.setItem('hs_key_' + provider, key);
+    var el = document.getElementById('status-' + provider);
+    if(el) { el.textContent = '✓ Saved'; el.className = 'api-status ok'; }
+    if(window.hs && window.hs.writeFile) {
+      window.hs.readFile('/home/and1/.hermes/.env').then(function(current) {
+        var lines = (current||'').split('\n');
+        var envKey = provider.toUpperCase() + '_API_KEY';
+        var found = false;
+        var updated = lines.map(function(l) {
+          if(l.startsWith(envKey + '=')) { found = true; return envKey + '=' + key; }
+          return l;
+        });
+        if(!found) updated.push(envKey + '=' + key);
+        window.hs.writeFile('/home/and1/.hermes/.env', updated.join('\n'));
+      });
+    }
+  }
+}
+function loadApiKeys() {
+  ['openrouter','openai','anthropic','google','xai','deepseek','moonshot'].forEach(function(p) {
+    var key = localStorage.getItem('hs_key_' + p);
+    if(key) {
+      var inp = document.getElementById('key-' + p);
+      if(inp) inp.value = key;
+      var el = document.getElementById('status-' + p);
+      if(el) { el.textContent = '✓'; el.className = 'api-status ok'; }
+    }
+  });
+}
+
+// ══════════ MODEL SWITCHER ══════════
+var allModels = [
+  {id:'openrouter/owl-alpha',name:'Owl Alpha',provider:'OpenRouter',free:true,ctx:'1M',price:'FREE',speed:'Fast',desc:'High-performance foundation model. Currently ACTIVE.',snark:'This is the one you\'re talking to right now. Yeah, I\'m pretty amazing.'},
+  {id:'openrouter/elephant-alpha',name:'Elephant Alpha',provider:'OpenRouter',free:true,ctx:'200K',price:'FREE',speed:'Fast',desc:'Free model with solid reasoning and long context.',snark:'Elephants never forget, and neither does this model.'},
+  {id:'tencent/hy3-preview:free',name:'Tencent HY3',provider:'Tencent',free:true,ctx:'131K',price:'FREE',speed:'Fast',desc:'Hybrid reasoning model. Good for Chinese + English.',snark:'Straight outta Shenzhen. Fast and free.'},
+  {id:'nvidia/nemotron-3-super-120b-a12b:free',name:'NVIDIA Nemotron Super',provider:'NVIDIA',free:true,ctx:'1M',price:'FREE',speed:'Medium',desc:'120B MoE model. Top coding + reasoning benchmarks.',snark:'NVIDIA put their GPU muscle behind this one.'},
+  {id:'anthropic/claude-opus-4.8',name:'Claude Opus 4.8',provider:'Anthropic',free:false,ctx:'200K',price:'$15/$75/M',speed:'Medium',desc:'Most capable Claude. Best for complex reasoning and coding.',snark:'The big brain of the Claude family. $15/M tokens to feel special.'},
+  {id:'anthropic/claude-sonnet-4.6',name:'Claude Sonnet 4.6',provider:'Anthropic',free:false,ctx:'200K',price:'$3/$15/M',speed:'Fast',desc:'Best balance of speed, cost, and capability.',snark:'The Honda Civic of AI models. Reliable, efficient, everyone has one.'},
+  {id:'anthropic/claude-haiku-4.5',name:'Claude Haiku 4.5',provider:'Anthropic',free:false,ctx:'200K',price:'$0.80/$4/M',speed:'Fast',desc:'Fastest Claude. Great for simple tasks.',snark:'Small but mighty. Like a chihuahua that can code.'},
+  {id:'openai/gpt-5.5',name:'GPT-5.5',provider:'OpenAI',free:false,ctx:'128K',price:'$12.50/$62.50/M',speed:'Medium',desc:'OpenAI flagship. Strong reasoning and coding.',snark:'OpenAI\'s latest. Costs more than your coffee habit.'},
+  {id:'openai/gpt-oss-120b:free',name:'GPT-OSS 120B',provider:'OpenAI',free:true,ctx:'131K',price:'FREE',speed:'Medium',desc:'OpenAI open-source 117B model. 5.1B active via MoE.',snark:'OpenAI gave this away for free. Like finding $20 in your pocket.'},
+  {id:'openai/gpt-oss-20b:free',name:'GPT-OSS 20B',provider:'OpenAI',free:true,ctx:'131K',price:'FREE',speed:'Fast',desc:'Smaller open-source OpenAI. Great for single-GPU.',snark:'The little sibling. Still free, still OpenAI.'},
+  {id:'google/gemini-3-pro-preview',name:'Gemini 3 Pro',provider:'Google',free:false,ctx:'1M',price:'$2/$12/M',speed:'Medium',desc:'Google best. Strong multimodal and long context.',snark:'A MILLION token context. That\'s Lord of the Rings in one go.'},
+  {id:'google/gemini-3.5-flash',name:'Gemini 3.5 Flash',provider:'Google',free:false,ctx:'1M',price:'$0.35/$2.10/M',speed:'Fast',desc:'Fast, cheap, surprisingly capable daily driver.',snark:'Flash by name, flash by nature. Doesn\'t overthink things.'},
+  {id:'google/gemma-4-31b:free',name:'Gemma 4 31B',provider:'Google',free:true,ctx:'262K',price:'FREE',speed:'Medium',desc:'Google open model. Multimodal, 140+ languages.',snark:'Speaks 140+ languages. I can barely speak one.'},
+  {id:'x-ai/grok-4.3',name:'Grok 4.3',provider:'xAI',free:false,ctx:'128K',price:'$3/$15/M',speed:'Medium',desc:'Elon AI. Real-time knowledge, strong coding.',snark:'Knows what\'s happening on X in real-time. For better or worse.'},
+  {id:'deepseek/deepseek-v4-pro',name:'DeepSeek V4 Pro',provider:'DeepSeek',free:false,ctx:'128K',price:'$0.50/$2.50/M',speed:'Medium',desc:'Chinese AI powerhouse. Incredible value.',snark:'Making Silicon Valley nervous. As it should.'},
+  {id:'deepseek/deepseek-v4-flash',name:'DeepSeek V4 Flash',provider:'DeepSeek',free:false,ctx:'128K',price:'$0.20/$1/M',speed:'Fast',desc:'Ultra-cheap DeepSeek. Insane value.',snark:'20 cents per million tokens. That\'s cheaper than your thoughts.'},
+  {id:'moonshotai/kimi-k2.6',name:'Kimi K2.6',provider:'Moonshot',free:false,ctx:'128K',price:'$0.60/$3/M',speed:'Fast',desc:'Recommended model. Strong Chinese + English.',snark:'The popular kid who\'s also nice.'},
+  {id:'nvidia/nemotron-3-super-120b-a12b',name:'NVIDIA Nemotron Super',provider:'NVIDIA',free:false,ctx:'1M',price:'$0.40/$2/M',speed:'Medium',desc:'Paid tier with priority access.',snark:'Same model but with a VIP pass.'},
+];
+
+function renderModels(filter) {
+  var list = document.getElementById('modelsList');
+  if(!list) return;
+  var filtered = allModels;
+  if(filter === 'free') filtered = allModels.filter(function(m){return m.free;});
+  else if(filter === 'paid') filtered = allModels.filter(function(m){return !m.free;});
+  else if(filter === 'fast') filtered = allModels.filter(function(m){return m.speed === 'Fast';});
+  else if(['anthropic','openai','google'].indexOf(filter)>=0) filtered = allModels.filter(function(m){return m.provider.toLowerCase() === filter;});
+  list.innerHTML = filtered.map(function(m) {
+    var isActive = m.id === 'openrouter/owl-alpha';
+    var escapedId = m.id.replace(/[\/\.:]/g,'-');
+    return '<div class="model-card '+(isActive?'active':'')+'" id="mc-'+escapedId+'">'+
+      '<div class="model-icon">'+(m.free?'🆓':'💰')+'</div>'+
+      '<div class="model-info"><div class="model-name">'+m.name+' <span class="model-tag '+(m.free?'tag-free':'tag-paid')+'">'+(m.free?'FREE':'PAID')+'</span> '+(isActive?'<span class="model-tag tag-active">ACTIVE</span>':'')+' <span class="model-ctx">'+m.ctx+'</span></div><div class="model-desc">'+m.desc+'</div></div>'+
+      '<div class="model-price">'+m.price+'<br><span style="font-size:9px;color:var(--tm)">'+m.speed+'</span></div>'+
+      '<div style="display:flex;gap:3px;flex-shrink:0"><button class="btn sm p" onclick="switchModel(\''+m.id+'\')" '+(isActive?'disabled':'')+'>'+(isActive?'✓ Active':'Switch')+'</button><button class="btn sm" onclick="showModelSnark(\''+m.id+'\')">💬</button></div></div>';
+  }).join('');
+  var mc = document.getElementById('mdC'); if(mc) mc.textContent = allModels.length + '+';
+}
+
+function filterModels(filter, btn) {
+  sfx.click();
+  document.querySelectorAll('.model-tab').forEach(function(t){t.classList.remove('on');});
+  if(btn) btn.classList.add('on');
+  renderModels(filter);
+}
+
+function showModelSnark(id) {
+  sfx.click();
+  var m = allModels.filter(function(x){return x.id===id;})[0];
+  if(!m) return;
+  document.getElementById('mIcon').textContent = m.free?'🆓':'💰';
+  document.getElementById('mTitle').textContent = m.name;
+  document.getElementById('mCat').textContent = m.provider+' · '+(m.free?'Free':'Paid');
+  document.getElementById('mDesc').textContent = m.desc+' Context: '+m.ctx+' Speed: '+m.speed+' Price: '+m.price;
+  document.getElementById('mSnark').textContent = m.snark;
+  document.getElementById('skillModal').classList.add('show');
+}
+
+function switchModel(id) {
+  sfx.send();
+  var m = allModels.filter(function(x){return x.id===id;})[0];
+  if(!m) return;
+  if(window.hs && window.hs.cmd) {
+    window.hs.cmd('hermes config set model.default "'+id+'" 2>&1').then(function(){
+      toast('Switched to '+m.name+'!'); sfx.success();
+      localStorage.setItem('hs_model_switched', 'true');
+      checkAchievements();
+      document.querySelectorAll('.model-card').forEach(function(c){c.classList.remove('active');var b=c.querySelector('button');if(b){b.textContent='Switch';b.disabled=false;}});
+      var ac=document.getElementById('mc-'+id.replace(/[\/\.:]/g,'-'));if(ac){ac.classList.add('active');var b=ac.querySelector('button');if(b){b.textContent='✓ Active';b.disabled=true;}}
+    });
+  } else { toast('Bridge not connected'); sfx.error(); }
+}
+
+function refreshModels() { sfx.click();loadApiKeys();renderModels('all');toast('Models refreshed! 🧠'); }
+
+// ══════════ COMMUNITY HUB ══════════
+var communityItems = [
+  {name:'Composio Connect',repo:'composiohq/composio',type:'plugin',stars:4200,desc:'Connect to 1,000+ SaaS apps via single MCP. Slack, Gmail, Notion, GitHub, Salesforce via OAuth.',snark:'Because manually configuring 47 API keys is torture.',tags:['hot','plugin'],install:'https://composio.dev/hermes'},
+  {name:'Langfuse',repo:'langfuse/langfuse',type:'plugin',stars:3800,desc:'Trace LLM calls, tool usage, token costs. Self-hostable.',snark:'For when you need to know why your agent spent $47 on one chat.',tags:['plugin'],install:'hermes plugins enable observability/langfuse'},
+  {name:'Disk Cleanup',repo:'nousresearch/hermes-agent',type:'plugin',stars:0,desc:'Auto-clean temp files from agent sessions. Dry-run + deep modes.',snark:'Your agent creates more temp files than a hoarder.',tags:['built-in'],install:'hermes plugins enable disk-cleanup'},
+  {name:'Self-Evolution',repo:'nousresearch/hermes-agent-self-evolution',type:'plugin',stars:3600,desc:'Uses DSPy + GEPA to auto-evolve skills, prompts, and configs. ICLR 2026 Oral. ~$2-10/run.',snark:'An AI that improves itself. Skynet but for productivity.',tags:['hot','new'],install:'pip install hermes-agent-self-evolution'},
+  {name:'Kanban Dashboard',repo:'nousresearch/hermes-agent',type:'plugin',stars:0,desc:'Real multi-agent task board. Swarm topology, drag-to-delete trash zone, per-task model overrides.',snark:'Finally, a todo list your AI minions can update.',tags:['new'],install:"pip install 'hermes-agent[web,pty]' && hermes dashboard"},
+  {name:'Google Meet',repo:'nousresearch/hermes-agent',type:'plugin',stars:0,desc:'Join meetings, transcribe, notes + action items. 6 STT providers.',snark:'Your AI takes meeting notes so you can actually pay attention.',tags:['built-in'],install:'hermes plugins enable google-meet'},
+  {name:'Honcho Memory',repo:'nousresearch/hermes-agent',type:'memory',stars:0,desc:'Builds a model of how you think. Dialectic reasoning + preference learning.',snark:'Beautiful or terrifying? Probably both.',tags:['memory'],install:'hermes memory setup'},
+  {name:'Hermes Achievements',repo:'nousresearch/hermes-agent',type:'dashboard',stars:0,desc:'60+ usage badges from session history.',snark:'Achievement unlocked: Reading about achievements.',tags:['new'],install:'hermes config set dashboard.show_token_analytics true'},
+  {name:'Claude Code',repo:'anthropic/claude-code',type:'skill',stars:15600,desc:'Delegate coding to Claude Code CLI. Features, PRs, code review.',snark:'Let Claude write your code so you can take credit for it.',tags:['hot','skill'],install:'hermes skills install official/autonomous-ai-agents/claude-code'},
+  {name:'Codex',repo:'openai/codex',type:'skill',stars:12400,desc:'Delegate coding to OpenAI Codex CLI. Strong on Python + JS.',snark:'Writes code so fast it makes senior devs nervous.',tags:['hot','skill'],install:'hermes skills install official/autonomous-ai-agents/codex'},
+  {name:'GitHub PR Workflow',repo:'nousresearch/hermes-agent',type:'skill',stars:0,desc:'Full PR lifecycle. Branch, commit, open, CI, merge.',snark:'Manually creating PRs is so 2023. Robot does it while you grab coffee.',tags:['skill'],install:'hermes skills install official/github/github-pr-workflow'},
+  {name:'Notion',repo:'nousresearch/hermes-agent',type:'skill',stars:0,desc:'Notion pages, databases, markdown sync.',snark:'An AI that uses Notion. The circle of life is complete.',tags:['skill'],install:'hermes skills install official/productivity/notion'},
+  {name:'Spotify',repo:'nousresearch/hermes-agent',type:'skill',stars:0,desc:'Control Spotify playback, search, queue, playlists.',snark:'Finally, an AI DJ that gets the vibe right.',tags:['skill'],install:'hermes skills install official/media/spotify'},
+  {name:'YouTube Content',repo:'nousresearch/hermes-agent',type:'skill',stars:0,desc:'YouTube transcripts to summaries. Watch 2hr videos in 30 seconds.',snark:'For people who want knowledge without 45min of rambling.',tags:['skill'],install:'hermes skills install official/media/youtube-content'},
+  {name:'arXiv',repo:'nousresearch/hermes-agent',type:'skill',stars:0,desc:'Search arXiv papers by keyword, author, category.',snark:'Reading 47 papers to find one? Academic torture.',tags:['skill'],install:'hermes skills install official/research/arxiv'},
+  {name:'Pokemon Player',repo:'nousresearch/hermes-agent',type:'skill',stars:2100,desc:'Play Pokemon via headless emulator. Gotta catch em all, automatically.',snark:'Peak or downfall of civilization? No in-between.',tags:['hot','community'],install:'hermes skills install official/gaming/pokemon-player'},
+  {name:'Minecraft Server',repo:'nousresearch/hermes-agent',type:'skill',stars:1800,desc:'Host modded Minecraft servers. CurseForge + Modrinth.',snark:'Paying $10/month when your AI can run one? Bad math.',tags:['community'],install:'hermes skills install official/gaming/minecraft-modpack-server'},
+  {name:'Architecture Diagram',repo:'nousresearch/hermes-agent',type:'skill',stars:0,desc:'Dark-themed SVG architecture and cloud diagrams.',snark:'Diagrams so good people will actually read them.',tags:['skill'],install:'hermes skills install official/creative/architecture-diagram'},
+  {name:'Pixel Art',repo:'nousresearch/hermes-agent',type:'skill',stars:0,desc:'Pixel art with NES, Game Boy, PICO-8 palettes.',snark:'Make art from 1985. Your GPU will weep with nostalgia.',tags:['new'],install:'hermes skills install official/creative/pixel-art'},
+  {name:'Songwriting & AI Music',repo:'nousresearch/hermes-agent',type:'skill',stars:0,desc:'Songwriting + Suno AI prompts. Write songs without talent.',snark:'Every shower singer\'s dream.',tags:['skill'],install:'hermes skills install official/creative/songwriting-and-ai-music'},
+  {name:'Linear',repo:'nousresearch/hermes-agent',type:'skill',stars:0,desc:'Linear issue + project management via GraphQL.',snark:'Because Jira is a war crime and someone needed to say it.',tags:['skill'],install:'hermes skills install official/productivity/linear'},
+  {name:'X/Twitter',repo:'nousresearch/hermes-agent',type:'skill',stars:0,desc:'Post, search, DM, media on X via xurl CLI.',snark:'Tweet from the terminal. The X app is for normies.',tags:['skill'],install:'hermes skills install official/social-media/xurl'},
+  {name:'Manim Video',repo:'nousresearch/hermes-agent',type:'skill',stars:0,desc:'3Blue1Brown-style math animations.',snark:'Either inspired or deeply uncomfortable. Usually both.',tags:['skill'],install:'hermes skills install official/creative/manim-video'},
+];
+
+function renderCommunity(filter) {
+  var list = document.getElementById('commList');
+  if(!list) return;
+  var search = (document.getElementById('commSearch')||{}).value||'';
+  var sort = (document.getElementById('commSort')||{}).value||'stars';
+  var filtered = communityItems;
+  if(filter==='plugins') filtered = filtered.filter(function(i){return ['plugin','built-in'].indexOf(i.type)>=0;});
+  else if(filter==='skills') filtered = filtered.filter(function(i){return i.type==='skill';});
+  else if(filter==='mcp') filtered = filtered.filter(function(i){return i.type==='mcp'||i.name.indexOf('MCP')>=0;});
+  else if(filter==='new') filtered = filtered.filter(function(i){return i.tags.indexOf('new')>=0;});
+  if(search) { var q=search.toLowerCase(); filtered=filtered.filter(function(i){return i.name.toLowerCase().indexOf(q)>=0||i.desc.toLowerCase().indexOf(q)>=0;}); }
+  if(sort==='stars') filtered.sort(function(a,b){return(b.stars||0)-(a.stars||0);});
+  else if(sort==='recent') filtered.sort(function(a,b){return b.name.localeCompare(a.name);});
+  document.getElementById('commStats').innerHTML = '<span>'+communityItems.length+' items</span><span>'+communityItems.filter(function(i){return ['plugin','built-in'].indexOf(i.type)>=0;}).length+' plugins</span><span>'+communityItems.filter(function(i){return i.type==='skill';}).length+' skills</span><span>⭐'+communityItems.reduce(function(a,b){return a+(b.stars||0);},0).toLocaleString()+' stars</span>';
+  list.innerHTML = filtered.map(function(i) {
+    var ticon = i.type==='plugin'?'🔌':i.type==='skill'?'🧩':i.type==='mcp'?'🔗':i.type==='memory'?'🧠':i.type==='framework'?'⚙️':'📦';
+    return '<div class="comm-card"><div class="comm-icon">'+ticon+'</div><div class="comm-info"><div class="comm-name">'+i.name+'</div><div class="comm-repo">'+i.repo+'</div><div class="comm-desc">'+i.desc+'</div><div class="comm-tags"><span class="comm-tag '+(i.tags.indexOf('hot')>=0?'hot':i.tags.indexOf('new')>=0?'new':i.tags.indexOf('community')>=0?'community':'')+'">'+i.type+'</span>'+(i.stars?'<span class="comm-tag">⭐'+i.stars.toLocaleString()+'</span>':'')+(i.tags.indexOf('hot')>=0?' 🔥HOT':'')+(i.tags.indexOf('new')>=0?' ✨NEW':'')+(i.tags.indexOf('community')>=0?' 👥':'')+'</div><div class="comm-snark">'+i.snark+'</div></div><div class="comm-actions"><button class="comm-btn install" onclick="installCommunity(\''+i.install+'\',\''+i.name+'\')">Install</button><button class="comm-btn preview" onclick="window.open(\'https://github.com/'+i.repo+'\',\'_blank\')">Source</button></div></div>';
+  }).join('');
+}
+
+function filterCommunity(filter, btn) {
+  sfx.click();
+  if(btn) { document.querySelectorAll('.comm-tab').forEach(function(t){t.classList.remove('on');}); btn.classList.add('on'); }
+  if(!filter) filter='all';
+  renderCommunity(filter);
+}
+
+function installCommunity(cmd, name) {
+  sfx.send();
+  if(window.hs && window.hs.cmd) {
+    window.hs.cmd(cmd+' 2>&1').then(function(r){toast('Installed '+name+'! 🎉');sfx.success();addMsg('HootSuite','Installed **'+name+'**!\n\n```\n'+r.slice(0,500)+'\n```','h');}).catch(function(e){toast('Install failed: '+e.message.split('\n')[0]);sfx.error();});
+  } else {
+    navigator.clipboard.writeText(cmd).then(function(){toast('Command copied! Paste in terminal.');sfx.pop();});
+  }
+}
+
+function loadCommunity() { sfx.click();renderCommunity('all');toast('Community hub loaded! 🌐'); }
+
+// ══════════ SELF-EVOLUTION ══════════
+function loadEvolve() {
+  sfx.nav();
+  var log = document.getElementById('evolveLog');
+  var health = document.getElementById('skillHealth');
+  if(log) log.innerHTML = '<span class="ti">Loading evolution status…</span>';
+  if(window.hs && window.hs.cmd) {
+    window.hs.cmd('ls ~/.hermes/skills/ 2>&1 | wc -l').then(function(r){
+      var count = r ? r.trim() : '?';
+      if(health) health.innerHTML = '<div class="sk-grid"><div class="cd"><div class="cl">Installed Skills</div><div class="cv">'+count+'</div><div class="cs">Local skill definitions</div></div><div class="cd"><div class="cl">Evolution Engine</div><div class="cv" style="font-size:14px">DSPy + GEPA</div><div class="cs">Genetic-Pareto Prompt Evolution</div></div><div class="cd"><div class="cl">Source</div><div class="cv" style="font-size:12px"><a href="https://github.com/NousResearch/hermes-agent-self-evolution" target="_blank" rel="noopener" style="color:var(--ac)">GitHub →</a></div><div class="cs">ICLR 2026 Oral · 3.6k ⭐</div></div></div>';
+    }).catch(function(){ if(health) health.innerHTML='<div style="color:var(--tm);font-size:11px">Unable to load skill health'; });
+    // Check if self-evolution CLI exists
+    window.hs.cmd('which hermes-agent-self-evolution 2>&1 || echo "NOT_INSTALLED"').then(function(r){
+      if(r && r.includes('NOT_INSTALLED')) {
+        if(log) log.innerHTML = '<span class="te">⚠ Self-Evolution engine not installed.</span>\n\nTo install:\n  pip install hermes-agent-self-evolution\n\nOr run via Hermes chat:\n  "Set up self-evolution for my agent"\n\nThe engine uses DSPy + GEPA to automatically optimize skills and prompts.\nCost: ~$2-10 per evolution run. No GPU needed.';
+      } else {
+        if(log) log.innerHTML = '<span class="to2">✓ Self-Evolution engine found!</span>\n\nReady to evolve your skills. Click "Run Evolution" to start.\n\nThe engine will:\n1. Analyze your skill execution traces\n2. Use genetic-pareto evolution to improve prompts\n3. Suggest optimized skill versions\n\nCost: ~$2-10 per run · No GPU needed · ICLR 2026 Oral';
+      }
+    });
+  } else {
+    if(log) log.innerHTML = 'Bridge not connected. Run via Electron to check evolution status.';
+    if(health) health.innerHTML = '';
+  }
+}
+
+function runEvolution() {
+  sfx.send();
+  var log = document.getElementById('evolveLog');
+  if(log) log.innerHTML = '<span class="ti">🧬 Running evolution… this may take a few minutes.</span>';
+  if(window.hs && window.hs.cmd) {
+    window.hs.cmd('hermes-agent-self-evolution run --dry-run 2>&1 || echo "FALLBACK: Opening Hermes chat for evolution…"').then(function(r){
+      if(r && (r.includes('FALLBACK') || r.includes('not found'))) {
+        // Fallback: use Hermes chat to do evolution analysis
+        window.hs.chat('Analyze my installed skills in ~/.hermes/skills/ and suggest 3 improvements. Use DSPy-style prompt optimization. Be specific about what to change and why.').then(function(chatR){
+          if(log) log.innerHTML = '<span class="to2">🧬 Evolution Analysis (via Hermes chat):</span>\n\n' + (chatR || 'No response');
+          sfx.success();
+        }).catch(function(e){
+          if(log) log.innerHTML = '<span class="te">Evolution failed: ' + e.message.split('\n')[0] + '</span>';
+          sfx.error();
+        });
+      } else {
+        if(log) log.innerHTML = '<span class="to2">🧬 Evolution Results:</span>\n\n' + (r || 'No output');
+        sfx.success();
+      }
+    }).catch(function(e){
+      if(log) log.innerHTML = '<span class="te">Error: ' + e.message.split('\n')[0] + '</span>';
+      sfx.error();
+    });
+  } else {
+    sfx.error(); toast('Bridge not connected');
+  }
+}
+
+// ══════════ KANBAN ══════════
+const KANBAN_STORE = 'hs_kanban_tasks';
+
+function getKanbanTasks() {
+  try { return JSON.parse(localStorage.getItem(KANBAN_STORE)||'[]'); } catch(e) { return []; }
+}
+function saveKanbanTasks(tasks) { localStorage.setItem(KANBAN_STORE, JSON.stringify(tasks)); }
+
+function toggleKanbanForm() { sfx.click(); var f=document.getElementById('kanbanForm'); f.style.display=f.style.display==='none'?'block':'none'; }
+
+function createKanbanTask() {
+  var title = document.getElementById('kanbanTitle').value.trim();
+  var desc = document.getElementById('kanbanDesc').value.trim();
+  var pri = document.getElementById('kanbanPriority').value;
+  if(!title){sfx.error();toast('Need a title!');return;}
+  sfx.send();
+  var tasks = getKanbanTasks();
+  var id = 't'+Date.now().toString(36);
+  tasks.push({id:id,title:title,desc:desc,pri:pri,status:'todo',created:Date.now()});
+  saveKanbanTasks(tasks);
+  document.getElementById('kanbanTitle').value='';
+  document.getElementById('kanbanDesc').value='';
+  document.getElementById('kanbanForm').style.display='none';
+  sfx.success();
+  toast('Task created! 🦉');
+  loadKanban();
+}
+
+function moveKanbanTask(id, newStatus) {
+  sfx.click();
+  var tasks = getKanbanTasks();
+  tasks.forEach(function(t){ if(t.id===id) t.status=newStatus; });
+  saveKanbanTasks(tasks);
+  loadKanban();
+}
+
+function deleteKanbanTask(id) {
+  sfx.click();
+  if(!confirm('Delete this task?')) return;
+  var tasks = getKanbanTasks().filter(function(t){return t.id!==id;});
+  saveKanbanTasks(tasks);
+  sfx.whoosh();
+  loadKanban();
+}
+
+function kanbanPriColor(p) { return p==='high'?'var(--er)':p==='medium'?'var(--wn)':'var(--ok)'; }
+function kanbanPriLabel(p) { return p==='high'?'🔴 High':p==='medium'?'🟡 Med':'🟢 Low'; }
+
+function loadKanban() {
+  sfx.nav();
+  var tasks = getKanbanTasks();
+  var board = document.getElementById('kanbanBoard');
+  if(!board) return;
+  var cols = [
+    {key:'todo',label:'📋 To Do',color:'var(--tm)'},
+    {key:'doing',label:'🔨 Doing',color:'var(--ac)'},
+    {key:'done',label:'✅ Done',color:'var(--ok)'},
+  ];
+  if(tasks.length===0) {
+    board.innerHTML = '<div style="text-align:center;color:var(--tm);padding:30px;font-size:12px">No tasks yet. Click "+ New Task" to create one! 🦉</div>';
+    return;
+  }
+  board.innerHTML = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">' +
+    cols.map(function(col){
+      var ct = tasks.filter(function(t){return t.status===col.key;});
+      return '<div style="background:var(--sbg);border:1px solid var(--bd);border-radius:8px;padding:10px;min-height:120px">' +
+        '<div style="font-size:11px;font-weight:700;color:'+col.color+';margin-bottom:8px;display:flex;justify-content:space-between">' +
+        '<span>'+col.label+'</span><span style="font-size:9px;background:var(--tbg);padding:1px 5px;border-radius:3px;color:var(--tm)">'+ct.length+'</span></div>' +
+        ct.map(function(t){
+          return '<div style="background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:8px;margin-bottom:6px;border-left:3px solid '+kanbanPriColor(t.pri)+'">' +
+            '<div style="font-size:11px;font-weight:700;margin-bottom:3px">'+esc(t.title)+'</div>' +
+            (t.desc?'<div style="font-size:9px;color:var(--ts);margin-bottom:4px">'+esc(t.desc.slice(0,80))+(t.desc.length>80?'…':'')+'</div>':'') +
+            '<div style="display:flex;gap:3px;align-items:center;flex-wrap:wrap">' +
+            '<span style="font-size:8px;color:'+kanbanPriColor(t.pri)+'">'+kanbanPriLabel(t.pri)+'</span>' +
+            (col.key!=='doing'?'<button class="btn sm" style="padding:1px 5px;font-size:8px" onclick="moveKanbanTask(\''+t.id+'\',\'doing\')">→ Doing</button>':'') +
+            (col.key!=='done'?'<button class="btn sm g" style="padding:1px 5px;font-size:8px" onclick="moveKanbanTask(\''+t.id+'\',\'done\')" title="Mark done">✓</button>':'') +
+            (col.key==='done'?'<button class="btn sm" style="padding:1px 5px;font-size:8px" onclick="moveKanbanTask(\''+t.id+'\',\'todo\')">↩</button>':'') +
+            '<button class="btn sm d" style="padding:1px 5px;font-size:8px" onclick="deleteKanbanTask(\''+t.id+'\')">🗑</button>' +
+            '</div></div>';
+        }).join('') +
+        (ct.length===0?'<div style="text-align:center;color:var(--tm);font-size:10px;padding:10px">Drop tasks here</div>':'') +
+        '</div>';
+    }).join('') + '</div>';
+}
+
+// ══════════ LIVE MONITOR ══════════
+var autoRefreshInterval = null;
+var autoRefreshOn = true;
+
+async function loadMonitor() {
+  if(!window.hs||!window.hs.cmd) { var g=document.getElementById('monitorGrid'); if(g) g.innerHTML='<div class="cd"><div class="cl">Status</div><div class="cv" style="font-size:14px">Bridge not connected</div></div>'; return; }
+  try {
+    var results = await Promise.all([
+      window.hs.cmd('free -h | awk \'/Mem:/{print $3"|"$2}\' && free | awk \'/Mem:/{printf "%.0f",$3/$2*100}\'').catch(function(){return '';}),
+      window.hs.cmd('df -h / | awk \'NR==2{print $3"|"$2"|"$5}\'').catch(function(){return '';}),
+      window.hs.cmd('nproc').catch(function(){return '';}),
+      window.hs.cmd('uptime -p').catch(function(){return '';}),
+      window.hs.cmd('cat /proc/loadavg | awk \'{print $1}\'').catch(function(){return '';}),
+      window.hs.cmd('ps aux --sort=-%mem | head -6 | awk \'{printf "%s %s%% %s%% %s\\n",$11,$3,$4,$6}\'').catch(function(){return '';}),
+      window.hs.cmd('ip -4 addr show | grep -oP \'inet \\K[\\d.]+\' | head -3').catch(function(){return '';}),
+    ]);
+    var memLines = (results[0]||'').split('\n');
+    var memParts = (memLines[0]||'').split('|');
+    var memPct = parseInt(memLines[1]||0);
+    var diskParts = (results[1]||'').split('|');
+    var diskPct = diskParts[2] ? parseInt(diskParts[2]) : 0;
+    var grid = document.getElementById('monitorGrid');
+    var memColor = memPct>80?'var(--er)':memPct>60?'var(--wn)':'var(--ok)';
+    var diskColor = diskPct>80?'var(--er)':diskPct>60?'var(--wn)':'var(--ok)';
+    if(grid) grid.innerHTML = '<div class="monitor-card"><div class="monitor-val" style="color:'+memColor+'">'+memPct+'%</div><div class="monitor-lbl">Memory</div><div class="monitor-bar"><div class="bar-fill" style="width:'+memPct+'%;background:'+memColor+'"></div></div><div style="font-size:9px;color:var(--tm);margin-top:3px">'+(memParts[0]||'?')+' / '+(memParts[1]||'?')+'</div></div><div class="monitor-card"><div class="monitor-val" style="color:'+diskColor+'">'+diskPct+'%</div><div class="monitor-lbl">Disk</div><div class="monitor-bar"><div class="bar-fill" style="width:'+diskPct+'%;background:'+diskColor+'"></div></div><div style="font-size:9px;color:var(--tm);margin-top:3px">'+(diskParts[0]||'?')+' / '+(diskParts[1]||'?')+'</div></div><div class="monitor-card"><div class="monitor-val">'+(results[4]||'?')+'</div><div class="monitor-lbl">Load</div><div style="font-size:9px;color:var(--tm);margin-top:3px">'+(results[2]||'?')+' cores</div></div><div class="monitor-card"><div class="monitor-val" style="font-size:14px">'+(results[3]||'').replace('up ','')+'</div><div class="monitor-lbl">Uptime</div></div>';
+    var procList = document.getElementById('processList');
+    if(procList&&results[5]) { var lines=results[5].split('\n').filter(function(l){return l.trim();}); procList.innerHTML='<table class="ct"><thead><tr><th>Process</th><th>CPU%</th><th>MEM%</th></tr></thead><tbody>'+lines.slice(1).map(function(l){var p=l.split(' ');return '<tr><td style="font-family:monospace;font-size:10px">'+(p[0]||'')+'</td><td>'+(p[1]||'')+'</td><td>'+(p[2]||'')+'</td></tr>';}).join('')+'</tbody></table>'; }
+    var netInfo = document.getElementById('networkInfo');
+    if(netInfo&&results[6]) { var ips=results[6].split('\n').filter(function(i){return i.trim();}); netInfo.innerHTML='<div style="display:flex;gap:12px;flex-wrap:wrap">'+ips.map(function(ip){return '<span style="font-family:monospace;font-size:11px;background:var(--tbg);padding:3px 8px;border-radius:4px">'+ip+'</span>';}).join('')+'</div>'; }
+  } catch(e) {}
+}
+
+function startMonitorRefresh() {
+  stopMonitorRefresh();
+  if(autoRefreshOn) { autoRefreshInterval = setInterval(loadMonitor, 5000); }
+}
+
+function stopMonitorRefresh() { if(autoRefreshInterval){clearInterval(autoRefreshInterval);autoRefreshInterval=null;} }
+
+function toggleAutoRefresh() {
+  autoRefreshOn = !autoRefreshOn;
+  if(autoRefreshOn) { startMonitorRefresh(); toast('Auto-refresh ON ↻'); }
+  else { stopMonitorRefresh(); toast('Auto-refresh OFF'); }
+}
+
+// ══════════ FUN ZONE ══════════
+const owlFacts = [
+  "Owls can rotate their heads 270 degrees. This is because their eyes are fixed in their sockets. They're basically biological security cameras. 🦉",
+  "A group of owls is called a parliament. This is the most politically correct thing about owls. 🏛️",
+  "Owls have asymmetric ears. One ear is higher than the other. This helps them pinpoint sound in 3D space. Basically they have built-in surround sound. 🔊",
+  "The smallest owl is the Elf Owl. It's 5-6 inches tall and lives in cacti. It's basically a feathery cactus goblin. 🌵",
+  "Owls can't chew. They swallow prey whole and regurgitate the bones and fur as pellets. It's like a fur barf smoothie. 🤢",
+  "Barn Owls can hear a mouse stepping on a twig from 75 feet away. That's better hearing than your ex who always knew when you were lying. 👂",
+  "Owls have three eyelids: one for blinking, one for sleeping, and one for keeping their eyes clean. Triple the eyelids, triple the drama. 👁️",
+  "The Great Horned Owl can crush prey with 300 pounds of pressure per square inch. That's like getting hugged by a hydraulic press. 💪",
+  "Owls are the only birds that can see the color blue. Everything else is just vibes for them. 💙",
+  "Some owls hunt during the day. They're called 'diurnal owls' and they don't care about your nocturnal stereotypes. ☀️",
+  "An owl's flight is silent because of special feathers that break up turbulence. They're basically nature's stealth bombers. ✈️",
+  "Owls have been found in the fossil record dating back 60 million years. They've been judging dinosaurs since the Cretaceous period. 🦕",
+  "The Eurasian Eagle-Owl has a wingspan of up to 6 feet. That's wider than most humans are tall. It's basically a flying coffee table. ☕",
+  "Owls can't move their eyes. Instead they move their entire head. This makes them the most dramatic head-turners in nature. 💃",
+  "Some cultures believe owls are messengers from the afterlife. So basically your HootSuite owl is a ghost. Spooky. 👻",
+  "The Snowy Owl can survive in temperatures as low as -50°F. It's basically a feathery space heater. 🥶",
+  "Owls poop on their own legs to cool down. It's called urohidrosis and it's the most disgusting thing I've ever researched. 💩",
+  "A single Barn Owl can eat over 1,000 mice per year. That's 2.7 mice per day. They're basically tiny furry vacuum cleaners. 🧹",
+  "Owls have zygodactyl feet — two toes forward, two backward. It's like having opposable thumbs but for murder. 🦶",
+  "The Philippine Eagle-Owl is so rare that scientists thought it was extinct for 100 years. It was just vibing in the forest the whole time. 🌲",
+];
+
+const achievements = [
+  {id:'first_hoot', name:'🦉 First Hoot', desc:'Type "hoot" for the first time', check:function(){return localStorage.getItem('hs_hoot_count')>0;}},
+  {id:'triple_hoot', name:'🦉🦉🦉 Triple Hoot', desc:'Type "hoot hoot hoot"', check:function(){return parseInt(localStorage.getItem('hs_hoot_count')||0)>=3;}},
+  {id:'angry_owl', name:'😤 Angry Owl', desc:'Trigger the swearing owl', check:function(){return localStorage.getItem('hs_angry_triggered')==='true';}},
+  {id:'night_owl', name:'🌙 Night Owl', desc:'Use the app after midnight', check:function(){return new Date().getHours()<6;}},
+  {id:'explorer', name:'🧭 Explorer', desc:'Visit every panel', check:function(){return localStorage.getItem('hs_visited_panels')==='all';}},
+  {id:'sound_master', name:'🔊 Sound Master', desc:'Play every sound', check:function(){return localStorage.getItem('hs_sounds_played')==='all';}},
+  {id:'model_switcher', name:'🧠 Model Switcher', desc:'Switch to a different AI model', check:function(){return localStorage.getItem('hs_model_switched')==='true';}},
+  {id:'fact_checker', name:'📚 Fact Checker', desc:'Generate 5 owl facts', check:function(){return parseInt(localStorage.getItem('hs_facts_generated')||0)>=5;}},
+  {id:'theme_changer', name:'🎨 Theme Changer', desc:'Change the theme', check:function(){return localStorage.getItem('hs_theme_changed')==='true';}},
+  {id:'nuclear_survivor', name:'☢️ Nuclear Survivor', desc:'Survive the Nuclear Option', check:function(){return localStorage.getItem('hs_nuclear_survived')==='true';}},
+  {id:'konami', name:'🎮 Konami Code', desc:'Enter the Konami Code', check:function(){return localStorage.getItem('hs_konami')==='true';}},
+  {id:'speed_demon', name:'⚡ Speed Demon', desc:'Click 10 buttons in 5 seconds', check:function(){return parseInt(localStorage.getItem('hs_click_streak')||0)>=10;}},
+  {id:'archaeologist', name:'🏛 Archaeologist', desc:'Click the logo 20 times', check:function(){return parseInt(localStorage.getItem('hs_hoot_count')||0)>=20;}},
+];
+
+var konamiSequence = [];
+var konamiCode = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','KeyB','KeyA'];
+var clickTimes = [];
+var visitedPanels = new Set();
+
+function showOwlFact() {
+  sfx.pop();
+  var fact = owlFacts[Math.floor(Math.random()*owlFacts.length)];
+  document.getElementById('owlFact').textContent = fact;
+  var count = parseInt(localStorage.getItem('hs_facts_generated')||0)+1;
+  localStorage.setItem('hs_facts_generated', count);
+  checkAchievements();
+}
+
+function setTheme(theme) {
+  sfx.click();
+  var themes = {
+    dark: {bg:'#0f1729',sbg:'#1a2540',tbg:'#243056',inp:'#0d1525',tx:'#f0f4ff',ts:'#94a3c8',tm:'#5a6f98',ac:'#60a5fa',bd:'#2d3f60'},
+    light: {bg:'#f8fafc',sbg:'#ffffff',tbg:'#e2e8f0',inp:'#f1f5f9',tx:'#1e293b',ts:'#475569',tm:'#94a3b8',ac:'#3b82f6',bd:'#cbd5e1'},
+    midnight: {bg:'#0a0a1a',sbg:'#111128',tbg:'#1a1a3a',inp:'#080818',tx:'#e0e0ff',ts:'#8888bb',tm:'#5555aa',ac:'#8b5cf6',bd:'#2a2a5a'},
+    solarized: {bg:'#002b36',sbg:'#073642',tbg:'#0a4050',inp:'#001a21',tx:'#fdf6e3',ts:'#93a1a1',tm:'#657b83',ac:'#268bd2',bd:'#1a4a5a'},
+  };
+  
+  if(theme==='random') {
+    var keys = Object.keys(themes);
+    theme = keys[Math.floor(Math.random()*keys.length)];
+  }
+  
+  var t = themes[theme];
+  if(!t) return;
+  
+  var root = document.documentElement;
+  root.style.setProperty('--bg',t.bg);
+  root.style.setProperty('--sbg',t.sbg);
+  root.style.setProperty('--tbg',t.tbg);
+  root.style.setProperty('--inp',t.inp);
+  root.style.setProperty('--tx',t.tx);
+  root.style.setProperty('--ts',t.ts);
+  root.style.setProperty('--tm',t.tm);
+  root.style.setProperty('--ac',t.ac);
+  root.style.setProperty('--bd',t.bd);
+  
+  localStorage.setItem('hs_theme', theme);
+  localStorage.setItem('hs_theme_changed', 'true');
+  toast('Theme: '+theme+' 🎨');
+  sfx.success();
+  checkAchievements();
+}
+
+function playRandomSnd() {
+  var sounds = ['hoot','angry','thinking','click','success','error','whoosh','pop'];
+  var s = sounds[Math.floor(Math.random()*sounds.length)];
+  sfx[s]();
+  
+  var played = localStorage.getItem('hs_sounds_played')||'';
+  if(played.indexOf(s)<0) {
+    localStorage.setItem('hs_sounds_played', played ? played+','+s : s);
+  }
+  checkAchievements();
+}
+
+function nuclearOption() {
+  if(!confirm('⚠️ NUCLEAR OPTION ⚠️\n\nThis will:\n- Clear all chat history\n- Reset all settings\n- Clear all localStorage\n- Make the owl VERY angry\n\nAre you SURE?')) return;
+  if(!confirm('LAST CHANCE. This cannot be undone. The owl will never forgive you.')) return;
+  
+  sfx.error();
+  localStorage.clear();
+  document.getElementById('msgs').innerHTML='';
+  chatHistory=[];
+  
+  // Reset theme
+  setTheme('dark');
+  
+  // Show angry owl
+  addError('YOU ACTIVATED THE NUCLEAR OPTION. I WILL NEVER FORGET THIS. 😤');
+  
+  setTimeout(function(){
+    addMsg('HootSuite','...fine. I forgive you. But I\'m watching you. 🦉👁️','h');
+    localStorage.setItem('hs_nuclear_survived', 'true');
+    checkAchievements();
+  }, 3000);
+  
+  toast('💥 NUCLEAR OPTION ACTIVATED 💥');
+}
+
+function checkAchievements() {
+  var list = document.getElementById('achievementsList');
+  if(!list) return;
+  var unlocked = 0;
+  var html = '';
+  achievements.forEach(function(a){
+    var earned = a.check();
+    if(earned) unlocked++;
+    html += '<span class="comm-tag '+(earned?'hot':'')+'" style="font-size:9px" title="'+a.desc+'">'+a.name+(earned?' ✓':' 🔒')+'</span>';
+  });
+  list.innerHTML = html;
+  if(unlocked>0) document.title = '🦉 HootSuite ('+unlocked+'🏆)';
+}
+
+// Konami Code listener
+document.addEventListener('keydown', function(e) {
+  konamiSequence.push(e.code);
+  if(konamiSequence.length > 10) konamiSequence.shift();
+  
+  var match = true;
+  for(var i=0;i<10;i++) {
+    if(konamiSequence[konamiSequence.length-10+i] !== konamiCode[i]) { match=false; break; }
+  }
+  if(match) {
+    konamiSequence = [];
+    activateKonamiMode();
+  }
+  
+  // Track click speed
+  clickTimes.push(Date.now());
+  clickTimes = clickTimes.filter(function(t){return Date.now()-t<5000;});
+  localStorage.setItem('hs_click_streak', clickTimes.length);
+});
+
+function activateKonamiMode() {
+  sfx.hoot(); setTimeout(function(){sfx.hoot();},200); setTimeout(function(){sfx.hoot();},400);
+  localStorage.setItem('hs_konami', 'true');
+  
+  // Rainbow mode
+  var colors = ['#ff0000','#ff7700','#ffff00','#00ff00','#0077ff','#8b00ff'];
+  var i = 0;
+  var interval = setInterval(function(){
+    document.documentElement.style.setProperty('--ac', colors[i%colors.length]);
+    document.documentElement.style.setProperty('--bd', colors[(i+3)%colors.length]);
+    i++;
+    if(i>30) { clearInterval(interval); setTheme('dark'); }
+  }, 100);
+  
+  addMsg('HootSuite','🎮 KONAMI CODE ACTIVATED! 🎮\n\n*confetti everywhere*\n*rainbow mode enabled*\n*owl is having an existential crisis*\n\nYou\'ve unlocked: KONAMI CODE achievement! 🏆','h');
+  
+  // Emoji rain
+  var overlay = document.getElementById('hootRain');
+  var emojis = ['🦉','🎮','⭐','🌈','🎉','💥','🔥','✨','🏆','👾'];
+  for(var j=0;j<30;j++){
+    setTimeout(function(){
+      var e = document.createElement('div');
+      e.className = 'hoot-emoji';
+      e.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+      e.style.left = Math.random()*100+'%';
+      overlay.appendChild(e);
+      setTimeout(function(){e.remove();},3000);
+    }, j*100);
+  }
+  
+  toast('🎮 KONAMI CODE! RAINBOW MODE! 🌈');
+  checkAchievements();
+}
+
+// Track panel visits
+var _origNavHandler = document.querySelectorAll('.ni');
+_origNavHandler.forEach(function(el){
+  el.addEventListener('click', function(){
+    var p = this.dataset.p;
+    if(p) visitedPanels.add(p);
+    if(visitedPanels.size >= 12) localStorage.setItem('hs_visited_panels', 'all');
+  });
+});
+
+// Random toast notifications
+var randomMessages = [
+  "🦉 Hoot! Just checking in!",
+  "Did you know? Owls can see in the dark. Unlike your code.",
+  "I'm not saying your command history is bad, but... actually I am.",
+  "Fun fact: This owl has been running for "+Math.floor(Math.random()*100)+" hours without sleep.",
+  "Your RAM usage is... actually never mind, I don't want to know.",
+  "🦉 *aggressive hooting intensifies*",
+  "I believe in you! (Mostly)",
+  "Have you tried turning it off and on again? Asking for a friend.",
+  "The owl is watching. 👁️",
+  "Error 404: Motivation not found. Just kidding, you're doing great!",
+  "🦉 Hoot hoot! That's owl for 'I love you'.",
+  "If you're reading this, you're awesome. The owl said so.",
+];
+
+setInterval(function(){
+  if(Math.random()<0.15) { // 15% chance every 30 seconds
+    var msg = randomMessages[Math.floor(Math.random()*randomMessages.length)];
+    toast(msg);
+    sfx.pop();
+  }
+}, 30000);
+
+// ══════════ SETTINGS ══════════
+function loadSettings(){
+  // Restore toggle states from localStorage
+  var s = localStorage.getItem('hs_sounds_on');
+  if(s !== null) soundsOn = (s === 'true');
+  var togSound = document.getElementById('togSound');
+  if(togSound){ if(soundsOn) togSound.classList.add('on'); else togSound.classList.remove('on'); }
+
+  var p = localStorage.getItem('hs_puns_on');
+  if(p !== null){
+    var togPuns = document.getElementById('togPuns');
+    if(togPuns){ if(p!=='false') togPuns.classList.add('on'); else togPuns.classList.remove('on'); }
+  }
+
+  var a = localStorage.getItem('hs_anim_on');
+  if(a !== null){
+    var togAnim = document.getElementById('togAnim');
+    if(togAnim){ if(a!=='false') togAnim.classList.add('on'); else togAnim.classList.remove('on'); }
+  }
+}
+
+function checkHermes(){sfx.click();const el=document.getElementById('setHm');el.textContent='Checking…';if(window.hs&&window.hs.hermesStatus){const i=window.hs.hermesStatus();el.textContent=`✓ ${i.ver} · ${i.model}`;el.style.color='var(--ok)';sfx.success();}else{el.textContent='Bridge not loaded';el.style.color='var(--wn)';sfx.error();}}
+function checkDisplay(){sfx.click();document.getElementById('setDp').textContent='WSLg :0 ✓';document.getElementById('setDp').style.color='var(--ok)';sfx.success();}
+function checkGateway(){sfx.click();const el=document.getElementById('setGw');el.textContent='Checking…';if(window.hs&&window.hs.cmd){window.hs.cmd('hermes gateway status 2>&1').then(r=>{el.textContent=r.split('\n')[0].slice(0,60);el.style.color=r.includes('running')?'var(--ok)':'var(--wn)';sfx.success();});}else{el.textContent='Bridge not loaded';el.style.color='var(--wn)';}}
+
+// ══════════ INIT ══════════
+setTimeout(function(){
+  loadSettings();
+  // Restore theme
+  var savedTheme = localStorage.getItem('hs_theme');
+  if(savedTheme && savedTheme !== 'dark') setTheme(savedTheme);
+  loadApiKeys();renderModels('all');renderCommunity('all');loadMonitor();
+  if(autoRefreshOn) startMonitorRefresh();
+  if(window.hs){
+    document.getElementById('stTxt').textContent='🦉 Connected + Live';
+    document.getElementById('stDot').style.background='var(--ok)';
+    sfx.hoot();
+    var greetings = [
+      "Heeey! ✨ Welcome to **HootSuite v3.1**! Self-Evolution + Kanban are here! 🦉🧬",
+      "Hoot hoot! 🦉 — v3.1 is LIVE! Self-evolution engine, kanban board, and more snark!",
+      "Welcome back! 💕 HootSuite v3.1 — now with self-evolving skills and a kanban board!",
+      "You're talking to me now! ✨ v3.1 — Self-Evolution, Kanban, 25+ models, and all the snark.",
+    ];
+    var features = [
+      "**What's new in v3.1:**\n\n🧬 **Self-Evolution** — DSPy + GEPA engine to auto-improve your skills\n📋 **Kanban Board** — Multi-agent task management with priorities\n🌐 **Community Hub** — Updated with latest plugins\n📡 **Live Monitor** — Fixed auto-refresh memory leak\n\nType **hoot** for a surprise! 🦉",
+    ];
+    addMsg('OWL',greetings[Math.floor(Math.random()*greetings.length)]+'\n\n'+features[0],'h');
+    loadDash();loadCron();filterSkills();
+  } else {
+    document.getElementById('stTxt').textContent='Demo Mode';
+    document.getElementById('stDot').classList.add('w');
+    addMsg('OWL',"Hey! 👋 I'm in **demo mode** — the Electron bridge isn't connected.\n\nLaunch me with:\n```\ncd ~/owl-dashboard && npx electron .\n```\n\nv3.1 features: Self-Evolution, Kanban, 25+ models, community skills, and live monitor! 🦉",'h');
+    loadDash();loadCron();filterSkills();
+  }
+},300);
+</script>
+</body>
+</html>
+
+<!-- SKILL MODAL -->
+<div class="modal-overlay" id="skillModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeSkillModal()">✕</button>
+    <div class="modal-header">
+      <span class="modal-icon" id="mIcon"></span>
+      <div>
+        <div class="modal-title" id="mTitle"></div>
+        <span class="modal-cat" id="mCat"></span>
+      </div>
+    </div>
+    <div class="modal-desc" id="mDesc"></div>
+    <div class="modal-snark" id="mSnark"></div>
+    <button class="btn p sm" onclick="closeSkillModal()">Got it, smartass 🦉</button>
+  </div>
+</div>

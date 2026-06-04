@@ -1,0 +1,11 @@
+# .gitignore
+node_modules/
+package-lock.json
+assets/
+icon-*.png
+icon.png
+.DS_Store
+Thumbs.db
+*.swp
+*.tmp
+.git/
