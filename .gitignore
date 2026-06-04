@@ -1,11 +1,21 @@
-# .gitignore
+# Dependencies
 node_modules/
 package-lock.json
-assets/
-icon-*.png
-icon.png
+
+# OS files
 .DS_Store
 Thumbs.db
 *.swp
 *.tmp
+
+# Large binaries (download separately)
+*.AppImage
+*.deb
+*.dmg
+*.exe
+*.msi
+*.zip
+*.tar.gz
+
+# Git
 .git/
